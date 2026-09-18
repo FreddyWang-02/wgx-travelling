@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "google-maps-grounding": {
+      "type": "streamableHttp",
+      "url": "https://mapstools.googleapis.com/mcp",
+      "headers": {
+        "X-Goog-Api-Key": "${GOOGLE_MAPS_API_KEY}"
+      },
+      "timeout": 30000
+    }
+  }
+}

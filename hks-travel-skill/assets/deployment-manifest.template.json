@@ -1,0 +1,14 @@
+{
+  "manifestVersion": "1.0.0",
+  "product": "hks-travel-skill",
+  "skillVersion": "4.12.0",
+  "frontendVersion": "4.12.0",
+  "hostAdapterVersion": "2.1.0",
+  "dataSchemaVersion": "1.1.0",
+  "compatibleDataSchemaVersions": ["1.1.0"],
+  "migrations": [],
+  "deploymentMode": "replace-at-deploy-time",
+  "deploymentId": "replace-at-deploy-time",
+  "siteUrl": "replace-at-deploy-time",
+  "deployedAt": "replace-at-deploy-time"
+}

@@ -1,0 +1,143 @@
+{
+  "protocol": "travelpack",
+  "schemaVersion": "1.1.0",
+  "baseRevision": null,
+  "appearance": { "styleId": "aviation" },
+  "trip": {
+    "id": "trip-beijing-2026",
+    "title": "北京，慢慢走",
+    "subtitle": "五天四晚 · 城市漫游",
+    "startDate": "2026-09-20",
+    "endDate": "2026-09-24",
+    "defaultTimezone": "Asia/Shanghai",
+    "destination": "北京",
+    "destinationCode": "PEK",
+    "note": "所有班次和开放信息均为演示内容，出行前请按订单与官方通知复核。"
+  },
+  "companions": [
+    { "id": "person-a", "name": "阿澈", "avatar": "A" },
+    { "id": "person-b", "name": "北北", "avatar": "B" },
+    { "id": "person-c", "name": "程程", "avatar": "C" },
+    { "id": "person-d", "name": "冬冬", "avatar": "D" }
+  ],
+  "days": [
+    { "id": "day-20", "date": "2026-09-20", "title": "抵达北京" },
+    { "id": "day-21", "date": "2026-09-21", "title": "故宫与景山" },
+    { "id": "day-22", "date": "2026-09-22", "title": "胡同慢行" },
+    { "id": "day-23", "date": "2026-09-23", "title": "长城一日" },
+    { "id": "day-24", "date": "2026-09-24", "title": "返程" }
+  ],
+  "places": [
+    { "id": "place-capital-airport", "name": "北京首都国际机场 T3", "address": "北京市顺义区机场西路", "links": [], "location": { "longitude": 116.615, "latitude": 40.052, "coordinateSystem": "WGS84" } },
+    { "id": "place-hotel", "name": "王府井住宿 · 演示", "address": "北京市东城区王府井大街", "links": [], "location": { "longitude": 116.412, "latitude": 39.915, "coordinateSystem": "WGS84" } },
+    { "id": "place-palace", "name": "故宫博物院", "address": "北京市东城区景山前街 4 号", "links": [{ "id": "link-palace-photo", "title": "拍照与参观攻略", "url": "https://www.dpm.org.cn/" }], "location": { "longitude": 116.397, "latitude": 39.918, "coordinateSystem": "WGS84" } },
+    { "id": "place-jingshan", "name": "景山公园", "address": "北京市西城区景山西街 44 号", "links": [], "location": { "longitude": 116.396, "latitude": 39.925, "coordinateSystem": "WGS84" } },
+    { "id": "place-shichahai", "name": "什刹海", "address": "北京市西城区羊房胡同", "links": [], "location": { "longitude": 116.385, "latitude": 39.94, "coordinateSystem": "WGS84" } },
+    { "id": "place-guozijian", "name": "国子监街", "address": "北京市东城区国子监街", "links": [], "location": { "longitude": 116.417, "latitude": 39.946, "coordinateSystem": "WGS84" } },
+    { "id": "place-beijing-north", "name": "北京北站", "address": "北京市西城区西直门北大街", "links": [], "location": { "longitude": 116.353, "latitude": 39.943, "coordinateSystem": "WGS84" } },
+    { "id": "place-badaling", "name": "八达岭长城", "address": "北京市延庆区军都山关沟古道北口", "links": [], "location": { "longitude": 116.016, "latitude": 40.355, "coordinateSystem": "WGS84" } },
+    { "id": "place-lama", "name": "雍和宫", "address": "北京市东城区雍和宫大街 12 号", "alternative": true, "notes": "雨天或返程前的备选。", "links": [], "location": { "longitude": 116.417, "latitude": 39.947, "coordinateSystem": "WGS84" } }
+  ],
+  "itineraryItems": [
+    { "id": "item-arrival", "dayId": "day-20", "placeId": "place-capital-airport", "order": 0, "kind": "transport", "startTime": "12:10", "endTime": "13:10", "notes": "取行李后前往住宿。" },
+    { "id": "item-hotel", "dayId": "day-20", "placeId": "place-hotel", "order": 1, "kind": "stay", "startTime": "14:30", "endTime": "15:00", "notes": "寄存行李，确认入住文件。" },
+    { "id": "item-palace", "dayId": "day-21", "placeId": "place-palace", "order": 0, "kind": "visit", "startTime": "08:30", "endTime": "14:30", "notes": "午门进，神武门出；预约证件随身携带。" },
+    { "id": "item-jingshan", "dayId": "day-21", "placeId": "place-jingshan", "order": 1, "kind": "visit", "startTime": "15:00", "endTime": "17:00", "notes": "从神武门步行前往，视天气决定是否登顶。" },
+    { "id": "item-guozijian", "dayId": "day-22", "placeId": "place-guozijian", "order": 0, "kind": "visit", "startTime": "10:00", "endTime": "12:00" },
+    { "id": "item-shichahai", "dayId": "day-22", "placeId": "place-shichahai", "order": 1, "kind": "visit", "startTime": "15:30", "endTime": "18:00", "notes": "保留自由步行时间，餐厅现场选择。" },
+    { "id": "item-beijing-north", "dayId": "day-23", "placeId": "place-beijing-north", "order": 0, "kind": "transport", "startTime": "07:20", "endTime": "08:05", "notes": "建议提前 40 分钟到站。" },
+    { "id": "item-badaling", "dayId": "day-23", "placeId": "place-badaling", "order": 1, "kind": "visit", "startTime": "09:30", "endTime": "15:00" },
+    { "id": "item-return", "dayId": "day-24", "placeId": "place-capital-airport", "order": 0, "kind": "transport", "startTime": "13:30", "endTime": "17:15", "notes": "按建议到达时间出发。" }
+  ],
+  "transportSegments": [
+    {
+      "id": "segment-outbound",
+      "purpose": "outbound",
+      "mode": "flight",
+      "from": { "name": "上海虹桥", "code": "SHA" },
+      "to": { "name": "北京首都", "code": "PEK" },
+      "departure": { "localDate": "2026-09-20", "localTime": "09:05", "timezone": "Asia/Shanghai", "precision": "minute" },
+      "arrival": { "localDate": "2026-09-20", "localTime": "11:25", "timezone": "Asia/Shanghai", "precision": "minute" },
+      "serviceNumber": "CA1502 · 示例",
+      "operator": "中国国际航空 · 演示",
+      "terminal": "T2",
+      "gate": "待通知",
+      "seat": "18A",
+      "status": "booked",
+      "milestones": [
+        { "kind": "airport_arrival", "label": "建议到达机场", "time": "07:00" },
+        { "kind": "checkin_close", "label": "值机截止", "time": "08:20" },
+        { "kind": "boarding", "label": "计划登机", "time": "08:35" }
+      ],
+      "notes": "演示航班信息，实际以订单和航司通知为准。",
+      "materialIds": ["material-flight"]
+    },
+    {
+      "id": "segment-mid",
+      "purpose": "intermediate",
+      "mode": "train",
+      "from": { "name": "北京北", "code": "VAP" },
+      "to": { "name": "八达岭长城", "code": "ILP" },
+      "departure": { "localDate": "2026-09-23", "localTime": "08:05", "timezone": "Asia/Shanghai", "precision": "minute" },
+      "arrival": { "localDate": "2026-09-23", "localTime": "08:39", "timezone": "Asia/Shanghai", "precision": "minute" },
+      "serviceNumber": "G 示范车次",
+      "operator": "中国铁路 · 演示",
+      "terminal": "候车区待通知",
+      "gate": "检票口待通知",
+      "seat": "06 车 08A",
+      "status": "planned",
+      "milestones": [{ "kind": "station_arrival", "label": "建议到达车站", "time": "07:20" }],
+      "notes": "车次与开售时间需在铁路官方渠道复核。",
+      "materialIds": []
+    },
+    {
+      "id": "segment-return",
+      "purpose": "return",
+      "mode": "flight",
+      "from": { "name": "北京首都", "code": "PEK" },
+      "to": { "name": "上海虹桥", "code": "SHA" },
+      "departure": { "localDate": "2026-09-24", "localTime": "17:15", "timezone": "Asia/Shanghai", "precision": "minute" },
+      "arrival": { "localDate": "2026-09-24", "localTime": "19:35", "timezone": "Asia/Shanghai", "precision": "minute" },
+      "serviceNumber": "MU5122 · 示例",
+      "operator": "东方航空 · 演示",
+      "terminal": "T2",
+      "gate": "待通知",
+      "seat": "待选座",
+      "status": "planned",
+      "milestones": [
+        { "kind": "airport_arrival", "label": "建议到达机场", "time": "14:45" },
+        { "kind": "checkin_close", "label": "值机截止", "time": "16:30" }
+      ],
+      "notes": "返程时间已包含在旅行日期内。",
+      "materialIds": []
+    }
+  ],
+  "stays": [
+    { "id": "stay-hotel", "placeId": "place-hotel", "checkIn": "2026-09-20", "checkOut": "2026-09-24", "status": "booked", "notes": "15:00 后入住；前台可寄存行李。", "materialIds": ["material-hotel"] }
+  ],
+  "tasks": [
+    { "id": "task-palace", "title": "预约故宫门票", "kind": "reservation", "status": "done", "dueAt": { "localDate": "2026-09-14", "localTime": "20:00", "timezone": "Asia/Shanghai", "precision": "minute" }, "relatedRefs": [{ "type": "itineraryItem", "id": "item-palace" }], "notes": "实名预约，入场当天携带证件。" },
+    { "id": "task-train", "title": "购买北京北至八达岭高铁票", "kind": "booking", "status": "pending", "dueAt": { "localDate": "2026-09-08", "localTime": "09:00", "timezone": "Asia/Shanghai", "precision": "minute" }, "relatedRefs": [{ "type": "transportSegment", "id": "segment-mid" }], "notes": "演示开售提醒，实际开售日按铁路官方规则核实。" },
+    { "id": "task-flight", "title": "复查返程航站楼与登机口", "kind": "recheck", "status": "pending", "dueAt": { "localDate": "2026-09-24", "localTime": "12:00", "timezone": "Asia/Shanghai", "precision": "minute" }, "relatedRefs": [{ "type": "transportSegment", "id": "segment-return" }] },
+    { "id": "task-id", "title": "身份证", "kind": "packing", "status": "done", "dueAt": null, "relatedRefs": [] },
+    { "id": "task-power", "title": "充电宝与数据线", "kind": "packing", "status": "pending", "dueAt": null, "relatedRefs": [] },
+    { "id": "task-rain", "title": "雨具与舒适步行鞋", "kind": "packing", "status": "pending", "dueAt": null, "relatedRefs": [] }
+  ],
+  "expenses": [
+    { "id": "expense-dinner", "date": "2026-09-21", "title": "晚餐", "category": "餐饮", "currency": "CNY", "amountMinor": 50000, "payerId": "person-a", "splitMode": "equal", "allocations": [{ "personId": "person-a", "amountMinor": 16667 }, { "personId": "person-b", "amountMinor": 16667 }, { "personId": "person-c", "amountMinor": 16666 }], "notes": "冬冬未参与。", "materialIds": [] },
+    { "id": "expense-taxi", "date": "2026-09-20", "title": "机场至酒店打车", "category": "交通", "currency": "CNY", "amountMinor": 12000, "payerId": "person-b", "splitMode": "equal", "allocations": [{ "personId": "person-a", "amountMinor": 3000 }, { "personId": "person-b", "amountMinor": 3000 }, { "personId": "person-c", "amountMinor": 3000 }, { "personId": "person-d", "amountMinor": 3000 }], "materialIds": [] },
+    { "id": "expense-ticket", "date": "2026-09-21", "title": "景点门票", "category": "门票", "currency": "CNY", "amountMinor": 24000, "payerId": "person-a", "splitMode": "custom", "allocations": [{ "personId": "person-a", "amountMinor": 8000 }, { "personId": "person-b", "amountMinor": 8000 }, { "personId": "person-c", "amountMinor": 8000 }], "materialIds": [] }
+  ],
+  "materials": [
+    { "id": "material-palace", "kind": "place", "title": "故宫参观信息", "description": "开放与预约信息请在出行前复核。", "url": "https://www.dpm.org.cn/", "relatedRefs": [{ "type": "place", "id": "place-palace" }], "assetIds": [], "sensitive": false },
+    { "id": "material-flight", "kind": "ticket", "title": "去程电子客票 · 原件占位", "description": "只读分享默认隐藏敏感原件。", "url": null, "relatedRefs": [{ "type": "transportSegment", "id": "segment-outbound" }], "assetIds": [], "sensitive": true },
+    { "id": "material-guide", "kind": "guide", "title": "北京中轴线步行攻略", "description": "Agent 汇总后的参考入口。", "url": "https://www.visitbeijing.com.cn/", "relatedRefs": [{ "type": "itineraryItem", "id": "item-palace" }], "assetIds": [], "sensitive": false },
+    { "id": "material-hotel", "kind": "ticket", "title": "住宿确认单 · 原件占位", "description": "入住人和订单号属于敏感信息。", "url": null, "relatedRefs": [{ "type": "stay", "id": "stay-hotel" }], "assetIds": [], "sensitive": true },
+    { "id": "material-map", "kind": "link", "title": "北京市文化和旅游局", "description": "目的地公共信息入口。", "url": "https://whlyj.beijing.gov.cn/", "relatedRefs": [], "assetIds": [], "sensitive": false }
+  ],
+  "assets": [],
+  "sources": [
+    { "id": "source-palace", "platform": "官方网站", "title": "故宫博物院", "url": "https://www.dpm.org.cn/", "retrievedAt": "2026-09-15", "freshness": { "kind": "dynamic", "checkedAt": "2026-09-15", "publishedAt": null, "validUntil": "2026-09-19", "status": "current" }, "note": "预约与开放信息需临行复核。" },
+    { "id": "source-tourism", "platform": "政府网站", "title": "北京市文化和旅游局", "url": "https://whlyj.beijing.gov.cn/", "retrievedAt": "2026-09-15", "freshness": { "kind": "seasonal", "checkedAt": "2026-09-15", "publishedAt": null, "validUntil": null, "status": "current" }, "note": "公共旅行信息参考。" }
+  ]
+}

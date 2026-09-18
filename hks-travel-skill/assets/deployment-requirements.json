@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "2.0.0",
+  "finalDelivery": {
+    "profiles": [
+      {
+        "id": "standard-cloud",
+        "required": ["hosting", "serverFunctions", "database", "secrets", "anonymousRead", "tokenRoutes"]
+      },
+      {
+        "id": "host-native",
+        "required": ["hosting", "database", "ownerEdit", "readOnlyShare", "accessControl", "conflictProtection"]
+      },
+      {
+        "id": "single-owner-published-share",
+        "required": ["hosting", "database", "ownerEdit", "publishedReadOnly", "accessControl", "savePreflight"]
+      }
+    ],
+    "optional": ["objectStorage", "placeSearch"]
+  },
+  "preference": [
+    "host-native",
+    "connected-mcp",
+    "authenticated-cli",
+    "user-cloud"
+  ],
+  "costPolicy": {
+    "freeRequiredByDefault": true,
+    "billingActivationRequiresConfirmation": true,
+    "apiKeyRequestPriority": "last"
+  },
+  "staticHosting": {
+    "allowedFor": ["ui-review"],
+    "allowedAsFinalDelivery": false
+  }
+}

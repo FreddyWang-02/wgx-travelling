@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "amap-maps": {
+      "type": "streamableHttp",
+      "url": "https://mcp.amap.com/mcp?key=${AMAP_MAPS_KEY}",
+      "timeout": 30000
+    }
+  }
+}

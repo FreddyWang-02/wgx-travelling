@@ -1,0 +1,37 @@
+.DS_Store
+Thumbs.db
+
+# Local credentials and environment
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+auth.secret
+
+# Runtime data and private exports
+data/
+mail-outbox/
+backups/
+output/
+*.sqlite
+*.sqlite3
+*.db
+*.log
+*.har
+*.trace
+
+# Tool caches and generated state
+.playwright-cli/
+.wrangler/
+node_modules/
+__pycache__/
+*.pyc
+.cache/
+tmp/
+
+# Release archives are built locally
+release/
+*.zip

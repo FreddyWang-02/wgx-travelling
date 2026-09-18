@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1450d2">
+  <title>漫游 · 旅行票夹</title>
+  <link rel="stylesheet" href="/vendor/leaflet/leaflet.css">
+  <link rel="stylesheet" href="/app.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="漫游旅行票夹首页">
+      <span class="brand-mark"><i data-lucide="route"></i></span>
+      <span><b>漫游</b><small>ROAM · TRAVEL WALLET</small></span>
+    </a>
+    <div class="top-actions">
+      <span class="access-badge" id="accessBadge">只读分享</span>
+      <span class="save-state" id="saveState" hidden></span>
+      <button class="text-button" id="styleButton" type="button"><i data-lucide="palette"></i><span>航空票夹</span></button>
+      <details class="more-menu" id="moreMenu">
+        <summary class="icon-button" aria-label="更多操作"><i data-lucide="ellipsis"></i></summary>
+        <div class="more-menu-panel">
+          <button id="tripButton" type="button" data-open-editor="trip" hidden>旅程</button>
+          <button id="agentButton" type="button" data-open-section="agent" hidden>Agent 更新</button>
+          <button id="exportButton" type="button" hidden>导出</button>
+          <button id="manifestButton" type="button" hidden>附件</button>
+          <button id="linksButton" type="button" hidden>分享</button>
+          <button id="dataButton" type="button" hidden>数据</button>
+        </div>
+      </details>
+      <button class="icon-button" id="themeButton" type="button" aria-label="切换明暗模式">
+        <i data-lucide="moon"></i>
+      </button>
+    </div>
+  </header>
+
+  <section class="trip-header" id="tripHeader" hidden>
+    <div class="trip-header-inner">
+      <p class="eyebrow">BOARDING WALLET · YOUR JOURNEY</p>
+      <div class="trip-title-row">
+        <div>
+          <h1 id="tripTitle"></h1>
+          <p id="tripMeta"></p>
+        </div>
+        <div class="trip-stamp" aria-hidden="true"><span>ROUTE</span><b id="tripCode">PEK</b></div>
+      </div>
+      <p class="trip-note" id="tripNote"></p>
+    </div>
+  </section>
+
+  <nav class="module-nav" id="moduleNav" aria-label="旅行模块" hidden>
+    <button data-tab="travel" class="active"><i data-lucide="tickets-plane"></i><span>出行</span></button>
+    <button data-tab="itinerary"><i data-lucide="route"></i><span>行程</span></button>
+    <button data-tab="prepare"><i data-lucide="list-checks"></i><span>准备</span></button>
+    <button data-tab="expenses"><i data-lucide="wallet-cards"></i><span>记账</span></button>
+    <button data-tab="materials"><i data-lucide="folder-open"></i><span>资料</span></button>
+  </nav>
+
+  <main id="app" tabindex="-1">
+    <section class="state-view" id="loadingView">
+      <span class="loading-mark"></span>
+      <h1>正在打开旅行票夹</h1>
+      <p>读取行程、票据和准备事项…</p>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <dialog id="dataDialog" aria-labelledby="dataDialogTitle">
+    <div class="dialog-head">
+      <div><span class="section-kicker">TRAVELPACK 1.1</span><h2 id="dataDialogTitle">导入与编辑数据</h2></div>
+      <button class="icon-button" id="dialogClose" type="button" aria-label="关闭">×</button>
+    </div>
+    <p class="dialog-note">可粘贴 Agent 生成的 TravelPack，或选择 JSON 文件。保存会整份更新旅行数据。</p>
+    <div class="dialog-actions">
+      <label class="file-button">选择 JSON 文件<input id="importFile" type="file" accept="application/json,.json"></label>
+      <button class="text-button" id="formatButton" type="button">格式化</button>
+    </div>
+    <textarea id="jsonEditor" spellcheck="false" aria-label="TravelPack JSON"></textarea>
+    <p class="dialog-error" id="dialogError" role="alert"></p>
+    <footer class="dialog-footer">
+      <button class="text-button" id="dialogCancel" type="button">取消</button>
+      <button class="text-button primary-action" id="saveButton" type="button">保存到云端</button>
+    </footer>
+  </dialog>
+
+  <dialog id="attachmentDialog" aria-labelledby="attachmentDialogTitle">
+    <div class="dialog-head">
+      <div><span class="section-kicker">ATTACHMENTS</span><h2 id="attachmentDialogTitle">上传附件</h2></div>
+      <button class="icon-button" id="attachmentDialogClose" type="button" aria-label="关闭">×</button>
+    </div>
+    <p class="dialog-note">支持 PDF、JPEG、PNG 和 WebP，单个文件不超过 5MB。附件会关联到已有资料条目。</p>
+    <div class="attachment-form">
+      <label>关联资料<select id="attachmentMaterial"></select></label>
+      <label>选择文件<input id="attachmentFile" type="file" accept="application/pdf,image/jpeg,image/png,image/webp"></label>
+    </div>
+    <p class="dialog-error" id="attachmentError" role="alert"></p>
+    <footer class="dialog-footer">
+      <button class="text-button" id="attachmentCancel" type="button">取消</button>
+      <button class="text-button primary-action" id="uploadAttachmentButton" type="button">上传并保存</button>
+    </footer>
+  </dialog>
+
+  <dialog id="maintenanceDialog" class="maintenance-dialog" aria-labelledby="maintenanceDialogTitle">
+    <div class="dialog-head">
+      <div><span class="section-kicker">EDIT</span><h2 id="maintenanceDialogTitle">编辑</h2></div>
+      <button class="icon-button" id="maintenanceClose" type="button" aria-label="关闭">×</button>
+    </div>
+    <div class="maintenance-body" id="maintenanceBody"></div>
+    <p class="dialog-error" id="maintenanceError" role="alert"></p>
+    <footer class="dialog-footer">
+      <button class="text-button" id="maintenanceCancel" type="button">关闭</button>
+    </footer>
+  </dialog>
+
+  <dialog id="linksDialog" aria-labelledby="linksDialogTitle">
+    <div class="dialog-head">
+      <div><span class="section-kicker">ACCESS LINKS</span><h2 id="linksDialogTitle">管理访问链接</h2></div>
+      <button class="icon-button" id="linksDialogClose" type="button" aria-label="关闭">×</button>
+    </div>
+    <p class="dialog-note">重新生成会让现有编辑链接和只读链接立即失效。新链接只显示在本次操作结果中，请分别保存。</p>
+    <div class="link-results" id="linkResults" hidden>
+      <label>新编辑链接<textarea id="newEditLink" readonly></textarea></label>
+      <button class="text-button" type="button" data-copy-link="newEditLink">复制编辑链接</button>
+      <label>新只读链接<textarea id="newReadLink" readonly></textarea></label>
+      <button class="text-button" type="button" data-copy-link="newReadLink">复制只读链接</button>
+    </div>
+    <p class="dialog-error" id="linksError" role="alert"></p>
+    <footer class="dialog-footer">
+      <button class="text-button" id="linksCancel" type="button">关闭</button>
+      <button class="text-button primary-action" id="rotateLinksButton" type="button">重新生成两条链接</button>
+    </footer>
+  </dialog>
+
+  <dialog id="styleDialog" class="style-dialog" aria-labelledby="styleDialogTitle">
+    <div class="dialog-head">
+      <div><span class="section-kicker">APPEARANCE</span><h2 id="styleDialogTitle">选择旅行界面风格</h2></div>
+      <button class="icon-button" id="styleDialogClose" type="button" aria-label="关闭">×</button>
+    </div>
+    <p class="dialog-note">六种风格共用数据与交互。新增三种方向先审核出行模块。</p>
+    <div class="style-options">
+      <button class="style-choice" type="button" data-style-choice="aviation">
+        <span class="style-preview style-preview-aviation"><b>漫游</b><strong>BOARDING WALLET</strong><i></i><i></i></span>
+        <span><b>航空票夹</b><small>原型基线 · 航空蓝 · 票夹与时间轴</small></span>
+      </button>
+      <button class="style-choice" type="button" data-style-choice="natural">
+        <span class="style-preview style-preview-natural"><b>漫游</b><strong>TRAVEL JOURNAL</strong><i></i><i></i></span>
+        <span><b>自然手账</b><small>暖白 · 鼠尾草绿 · 旅行手账</small></span>
+      </button>
+      <button class="style-choice" type="button" data-style-choice="minimal">
+        <span class="style-preview style-preview-minimal"><b>漫游</b><strong>TRIP OVERVIEW</strong><i></i><i></i></span>
+        <span><b>极简导览</b><small>冷白 · 清晰蓝 · 高信息密度</small></span>
+      </button>
+      <button class="style-choice" type="button" data-style-choice="collage">
+        <span class="style-preview style-preview-collage"><b>漫游</b><strong>切开城市 · 拼出路线</strong><i></i><i></i></span>
+        <span><b>拼贴裁纸</b><small>毛边纸片 · 橙蓝撞色 · 旅行剪报</small></span>
+      </button>
+      <button class="style-choice" type="button" data-style-choice="print">
+        <span class="style-preview style-preview-print"><b>漫游日报</b><strong>ROUTE / 01</strong><i></i><i></i></span>
+        <span><b>印刷风</b><small>套色油墨 · 网点肌理 · 编辑版式</small></span>
+      </button>
+      <button class="style-choice" type="button" data-style-choice="urban">
+        <span class="style-preview style-preview-urban"><b>ROAM / CITY</b><strong>TRANSIT SYSTEM</strong><i></i><i></i></span>
+        <span><b>都市设计</b><small>夜灰 · 荧光绿 · 交通导视</small></span>
+      </button>
+    </div>
+    <footer class="dialog-footer">
+      <span class="style-help">预览选择保存在当前浏览器；Agent 会将你确认的 styleId 写入正式 TravelPack。</span>
+      <button class="text-button primary-action" id="styleDialogDone" type="button">完成选择</button>
+    </footer>
+  </dialog>
+
+  <script src="/lucide.js"></script>
+  <script src="/vendor/leaflet/leaflet.js"></script>
+  <script type="module" src="/app.mjs"></script>
+</body>
+</html>

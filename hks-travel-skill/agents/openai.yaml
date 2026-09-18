@@ -1,0 +1,4 @@
+interface:
+  display_name: "Hks-Travel-Skill"
+  short_description: "选定 UI 后交付可编辑、可保存、可分享的旅行工具"
+  default_prompt: "请使用 $hks-travel-skill 研究这趟旅行；确认路线后先展示 UI 样式供我选择，再优先使用当前 Agent 自带或已连接的免费云能力，交付可编辑链接和只读分享链接。"
