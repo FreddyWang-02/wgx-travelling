@@ -121,4 +121,6 @@ node hks-travel-skill/scripts/serve_ui_preview.mjs /tmp/p4a --port 4179
 
 - 分支 `phase4a-homepage-visual` 已推送到 `origin`，与远端一致；**main 未改动、未合并**。
 - 收尾门禁：`npm run check` → audit `safe: true` / `filesScanned: 156`，76 pass / 0 fail。
+- **截图已内嵌在 `报告/phase4a-report.md`**（16 张相对路径图片，含合成总览长图），
+  报告可以单独转交、自己带图；逐张清单与说明另见 `docs/screenshots/phase4a/README.md`。
 - 按阶段要求**没有创建 PR**，等视觉审核通过后再决定合并方式。

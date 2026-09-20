@@ -2,6 +2,7 @@
 
 > 本报告供转交外部模型作为上下文使用。信息完整优先，格式不限。
 > 视觉真相以仓库根目录 `DESIGN.md` 为准；本文记录"为什么这么做、怎么做的、验收结果"。
+> **本文档自带 16 张验收截图**（相对路径内嵌于第 18 节），可单独转交外部模型作为上下文。
 
 - 仓库：`https://github.com/FreddyWang-02/wgx-travelling`
 - 分支：`phase4a-homepage-visual`（基于 `main` = `cb45788`，**未合并 main**）
@@ -353,7 +354,56 @@ npm run check
 | `prefers-reduced-motion` | 全部 `animationName = none`；航线 `stroke-dashoffset = 0`（保持可见）；纸飞机停在终点（`translate(392px, 38px)`）；所有板块 `opacity = 1` |
 | 390px 首屏 | Hero 705px，`heroBottom = 777` < 底部导航 `top = 776`；主/次 CTA 均在首屏内 |
 
-截图见 `docs/screenshots/phase4a/`（15 张 + 总览长图 + 逐张说明 README）。
+### 截图（已随仓库提交，报告自带图片）
+
+全部截图位于 `docs/screenshots/phase4a/`，取自**同一份最终构建**，未经后期修饰。
+逐张清单与说明见 `docs/screenshots/phase4a/README.md`。
+
+**一张图看完**（15 张合成，适合整体转交）：
+
+![Phase 4A 首页视觉验收总览](../docs/screenshots/phase4a/contact-sheet.jpg)
+
+#### 桌面端 1440 × 900
+
+| 首屏 Hero | 笔记本 1280 × 800 |
+|---|---|
+| ![桌面首屏](../docs/screenshots/phase4a/desktop-hero.jpg) | ![笔记本首屏](../docs/screenshots/phase4a/laptop-hero.jpg) |
+
+| 今天的旅程 / 为什么这样安排 | 已锁定安排 / 旅行状态 |
+|---|---|
+| ![旅程与理由](../docs/screenshots/phase4a/desktop-02-journey-why.jpg) | ![锁定与状态](../docs/screenshots/phase4a/desktop-03-locked-status.jpg) |
+
+| 别错过 / 出行票据 | 平板 768 × 1024（单列封面） |
+|---|---|
+| ![灵感与票据](../docs/screenshots/phase4a/desktop-04-inspiration.jpg) | ![平板首屏](../docs/screenshots/phase4a/tablet-768-hero.jpg) |
+
+**桌面整页长图**（Hero → 今天的旅程 → 为什么这样安排 → 已锁定安排 → 旅行状态 → 别错过 → 出行票据）：
+
+![桌面整页](../docs/screenshots/phase4a/desktop-home-full.jpg)
+
+#### 移动端 390 × 844（正式验收目标）
+
+| 首屏（Travel Postcard Cover） | 今天的旅程 |
+|---|---|
+| ![移动首屏](../docs/screenshots/phase4a/mobile-390-hero.jpg) | ![移动旅程](../docs/screenshots/phase4a/mobile-390-02-journey.jpg) |
+
+| 旅行状态 / 别错过 | 深色模式首屏 |
+|---|---|
+| ![移动状态](../docs/screenshots/phase4a/mobile-390-03-status.jpg) | ![深色首屏](../docs/screenshots/phase4a/dark-hero.jpg) |
+
+**移动整页长图**（无横向溢出）：
+
+![移动整页](../docs/screenshots/phase4a/mobile-390-home-full.jpg)
+
+#### 无障碍与回归证据
+
+| prefers-reduced-motion（动效全停、内容不变） | 回归 · 行程模块未被影响 |
+|---|---|
+| ![减少动效](../docs/screenshots/phase4a/reduced-motion-hero.jpg) | ![行程回归](../docs/screenshots/phase4a/regression-itinerary.jpg) |
+
+| 回归 · 航空票夹仍是 Phase 3 票夹概览 |
+|---|
+| ![风格回归](../docs/screenshots/phase4a/regression-aviation-overview.jpg) |
 
 ---
 
