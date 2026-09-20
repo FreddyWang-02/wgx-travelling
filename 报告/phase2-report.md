@@ -347,10 +347,10 @@ tripStatus               ← 1.2 新增（字符串）
 | 分支 | `phase2-travelpack-1.2`（基于 `main` @ `70e0dd0`） |
 | 主 Commit | `13d87e1` — `feat: add TravelPack 1.2 planning metadata schema` |
 | 测试 Commit | `31359cb` — `test: cover TravelPack 1.2 validation and preview compatibility` |
-| 报告 Commit | 本文件所在提交 — `docs: add Phase 2 handoff and completion report` |
+| 报告 Commit | `a98b04f` — `docs: add Phase 2 handoff and completion report` |
 | 是否修改 main | **否**，全部改动只在 feature 分支 |
 | 是否合并 main | **否**，等用户审核 |
-| 是否 push | 见文末状态 |
+| 是否 push | **是**，已推送到 `origin/phase2-travelpack-1.2`（新分支） |
 
 ---
 
