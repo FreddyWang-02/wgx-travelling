@@ -50,7 +50,7 @@
   </section>
 
   <nav class="module-nav" id="moduleNav" aria-label="旅行模块" hidden>
-    <button data-tab="travel" class="active"><i data-lucide="tickets-plane"></i><span>出行</span></button>
+    <button data-tab="overview" class="active"><i data-lucide="layout-dashboard"></i><span>概览</span></button>
     <button data-tab="itinerary"><i data-lucide="route"></i><span>行程</span></button>
     <button data-tab="prepare"><i data-lucide="list-checks"></i><span>准备</span></button>
     <button data-tab="expenses"><i data-lucide="wallet-cards"></i><span>记账</span></button>
@@ -67,9 +67,53 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+  <button class="copilot-fab" id="copilotFab" type="button" aria-label="打开 Travel AI 调整助手" hidden>
+    <span class="copilot-fab-mark" aria-hidden="true">✨</span>
+    <span class="copilot-fab-label">Travel AI</span>
+  </button>
+
+  <dialog id="copilotDialog" class="sheet-dialog copilot-dialog" aria-labelledby="copilotTitle">
+    <div class="dialog-head">
+      <div><span class="section-kicker">TRAVEL AI</span><h2 id="copilotTitle">✨ Travel AI</h2></div>
+      <button class="icon-button" id="copilotClose" type="button" aria-label="关闭">×</button>
+    </div>
+    <p class="dialog-note" id="copilotContext"></p>
+    <div class="copilot-body">
+      <div class="copilot-quick" id="copilotQuick"></div>
+      <label class="copilot-input">
+        <span>也可以直接说</span>
+        <textarea id="copilotText" rows="3" placeholder="例如：今天想在附近找一家咖啡馆，别走太远。"></textarea>
+      </label>
+      <div class="copilot-request" id="copilotRequest" hidden>
+        <div class="field-heading"><h3 id="copilotRequestTitle">调整请求</h3><span id="copilotMode"></span></div>
+        <textarea id="copilotRequestText" readonly aria-label="调整请求内容"></textarea>
+        <div class="copilot-actions">
+          <button class="text-button" id="copilotCopy" type="button"><i data-lucide="copy"></i> 复制调整请求</button>
+          <button class="text-button primary-action" id="copilotSend" type="button" hidden>交给当前 Agent 处理</button>
+        </div>
+        <p class="plain-note" id="copilotHint"></p>
+      </div>
+    </div>
+    <footer class="dialog-footer">
+      <button class="text-button" id="copilotDone" type="button">关闭</button>
+    </footer>
+  </dialog>
+
+  <dialog id="alternativesDialog" class="sheet-dialog" aria-labelledby="alternativesTitle">
+    <div class="dialog-head">
+      <div><span class="section-kicker">ALTERNATIVES</span><h2 id="alternativesTitle">换一个</h2></div>
+      <button class="icon-button" id="alternativesClose" type="button" aria-label="关闭">×</button>
+    </div>
+    <p class="dialog-note" id="alternativesNote"></p>
+    <div class="alternatives-body" id="alternativesBody"></div>
+    <footer class="dialog-footer">
+      <button class="text-button" id="alternativesDone" type="button">关闭</button>
+    </footer>
+  </dialog>
+
   <dialog id="dataDialog" aria-labelledby="dataDialogTitle">
     <div class="dialog-head">
-      <div><span class="section-kicker">TRAVELPACK 1.1</span><h2 id="dataDialogTitle">导入与编辑数据</h2></div>
+      <div><span class="section-kicker" id="dataDialogKicker">TRAVELPACK</span><h2 id="dataDialogTitle">导入与编辑数据</h2></div>
       <button class="icon-button" id="dialogClose" type="button" aria-label="关闭">×</button>
     </div>
     <p class="dialog-note">可粘贴 Agent 生成的 TravelPack，或选择 JSON 文件。保存会整份更新旅行数据。</p>
