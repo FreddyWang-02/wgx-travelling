@@ -7,6 +7,23 @@ Generated: 2026-09-20 (Phase 0 complete)
 
 ---
 
+## Phase Status（Phase 2 完成后回填）
+
+| Phase | 内容 | 状态 |
+|---|---|---|
+| Phase 0 | Foundation（原样导入并验证） | implemented |
+| Phase 1 | Skill Intelligence | implemented（已合并 main） |
+| Phase 2 | TravelPack 1.2 数据契约 | **implemented / completed**（分支 `phase2-travelpack-1.2`，未合并 main） |
+| Phase 3 | Product UX | not started |
+
+**本文档的性质**：以下是 Phase 0 时代的历史设计稿，**不是现行权威文档**。各 Phase 的实际实现以代码、`PHASE_N_HANDOFF.md`、`报告/phaseN-report.md` 与 `hks-travel-skill/references/` 下的契约文档为准。
+
+**不要重复实现**：Phase 0 / 1 / 2 均已完成，后续 Agent 不要按本文档重新实现这些内容。
+
+**TravelPack 1.2 的现行权威文档**：`hks-travel-skill/references/travelpack-1.2.md`。本文档与它冲突时，**一律以 `travelpack-1.2.md` 为准**。
+
+---
+
 ## Current State
 
 Phase 0 complete. The repository is a faithful, validated copy of the original project:
@@ -52,17 +69,34 @@ Phase 0 complete. The repository is a faithful, validated copy of the original p
 
 **Goal:** Extend the data schema without breaking 1.1 consumers.
 
+**Status: implemented / completed.** 已在分支 `phase2-travelpack-1.2` 交付（`13d87e1` schema、`31359cb` tests、`a98b04f` / `b72de90` docs）。**不要重新实现。**
+
+### Phase 2 Final Decision / Superseded
+
+本节是 Phase 2 实现完成后的回填说明，用于纠正下方 Phase 0 草案中已经过期的设计。**下方草案原文保留不改写，但以下决定优先级更高。**
+
+| 事项 | Phase 0 草案 | Phase 2 最终决定 |
+|---|---|---|
+| Hard Constraints 容器 | `constraints` **object** | **`constraints[]` 数组**。每项含 `id`、`kind`、`description`、`relatedRefs[]`、`status`、`source`、`startAt`、`endAt` |
+| 旅行整体状态取值 | `"draft"` 等 | **`planning` / `confirmed` / `in-progress` / `completed`** |
+| `draft` | 草案取值 | **已废弃（superseded）**，由 `planning` 替代 |
+| `planningMeta` 用途 | "reasoning trace summary" | 只保存可公开的规划元信息（`mode`、时间戳、`overallConfidence`、`needsRecheckCount`）。**禁止保存 chain-of-thought、隐藏推理或内部推理日志** |
+| 新增字段校验 | 草案未定义 | validator 同时支持 `1.1.0` 与 `1.2.0`；完整规则见 `hks-travel-skill/references/travelpack-1.2.md` |
+| 字段文档位置 | 草案写明改 `product-contract.md` | 字段文档统一写入 `hks-travel-skill/references/travelpack-1.2.md`（见下方 Rules 回填说明） |
+
+**权威文档**：TravelPack 1.2 的现行权威文档为 `hks-travel-skill/references/travelpack-1.2.md`。**本文档（MIGRATION_PLAN.md）与它冲突时，一律以 `travelpack-1.2.md` 为准。**
+
 ### New top-level fields ( additive, non-breaking )
 
 ```jsonc
 {
   "preferences": { /* soft preferences: cuisine, pace, crowd-tolerance, etc. */ },
-  "constraints": { /* hard constraints: budget max, date range, accessibility, visa */ },
-  "planningMeta": { /* planner version, reasoning trace summary */ },
+  "constraints": { /* hard constraints: budget max, date range, accessibility, visa */ }, // SUPERSEDED: 最终为 constraints[] 数组，见上方 Final Decision
+  "planningMeta": { /* planner version, reasoning trace summary */ }, // SUPERSEDED: 不保存 reasoning trace，只保留可公开元信息
   "alternatives": [ /* parallel itinerary options with trade-off notes */ ],
   "decisionLog": [ /* why each segment was chosen, what was rejected */ ],
   "replanHistory": [ /* previous plan revisions with timestamps */ ],
-  "tripStatus": "draft" | "confirmed" | "in-progress" | "completed"
+  "tripStatus": "draft" | "confirmed" | "in-progress" | "completed" // SUPERSEDED: draft 已废弃，由 planning 替代
 }
 ```
 
@@ -71,6 +105,7 @@ Phase 0 complete. The repository is a faithful, validated copy of the original p
 - 1.1 schema validation passes on 1.2 data (1.2 is a superset)
 - Add `validate_travelpack.mjs` checks for new fields
 - Update `product-contract.md` with new fields
+  - **回填（Phase 2 最终决定）**：未改 `product-contract.md`。该文档描述五模块产品面；TravelPack 1.2 的字段文档统一写入 `hks-travel-skill/references/travelpack-1.2.md`。
 
 ---
 
@@ -210,3 +245,5 @@ To proceed from Phase 0 to Phase 1:
 - [x] FOUNDATION_AUDIT.md written
 - [x] Migration plan documented
 - [ ] User confirms readiness to begin Phase 1
+
+> **回填说明（Phase 2 完成后）**：以上是 Phase 0 → Phase 1 的进入条件，**Phase 1 与 Phase 2 均已完成**，最后一项的历史状态不再代表当前进度。Phase 2 的实际状态、validator 兼容策略与 Phase 3 进入条件见 `PHASE_2_HANDOFF.md` 与 `报告/phase2-report.md`。

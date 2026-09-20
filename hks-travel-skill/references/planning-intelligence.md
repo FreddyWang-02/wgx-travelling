@@ -1,6 +1,16 @@
 # 规划智能：约束、偏好、候选池与可解释决策
 
-本文件定义旅行规划阶段的智能规则，约束 [SKILL 工作流](../SKILL.md) 的研究到规划阶段。不修改 [TravelPack 1.1](travelpack-1.1.md) 字段契约，不引入 schema 变更。
+本文件定义旅行规划阶段的智能规则，约束 [SKILL 工作流](../SKILL.md) 的研究到规划阶段。
+
+字段契约以 [TravelPack 1.2](travelpack-1.2.md) 为准，本文件不重复定义 schema；1.1 契约见 [TravelPack 1.1](travelpack-1.1.md)。本文件只负责"这些智能行为写入哪个结构"。
+
+| 规划智能 | 写入字段 |
+|---|---|
+| Soft Preferences | `preferences` |
+| Hard Constraints | `constraints[]` |
+| Explainable Planning | `decisionLog[]` |
+| Candidate alternatives（候选替代方案） | `alternatives[]` |
+| 规划模式与置信度 | `planningMeta` |
 
 ## 意图、偏好与约束提取
 
@@ -26,6 +36,7 @@
 - 规划与行程草案必须围绕 Hard Constraint 组织；冲突必须显式展示给用户并等待决定，禁止自动取舍。
 - 修改 Hard Constraint 只来自用户明确指令，修改后以用户表述为准。
 - Hard Constraint 在行程中的承载方式：航班写入 `transportSegments`，住宿写入 `stays`，预约餐厅、演出、必去地点与时间窗写入 `itineraryItems`，均保留用户给定的时间。
+- 每条 Hard Constraint 同时写入 TravelPack 1.2 的 `constraints[]`，`source` 只允许 `user`、`booking`、`material`、`external`；模型推测不得写入 `constraints[]`。
 
 ## Soft Preferences（软偏好）
 
@@ -46,6 +57,7 @@
 - Soft Preference 用于候选排序与行程优化，允许在冲突时权衡，但权衡必须可解释。
 - 多个 Soft Preference 冲突时按用户当次强调的优先；仍无法判断时给用户提供 1 到 2 个替代方案，不让用户做无上下文的选择题。
 - 禁止把 Soft Preference 升级为 Hard Constraint；禁止因 Soft Preference 破坏 Hard Constraint。
+- 每条 Soft Preference 写入 TravelPack 1.2 的 `preferences`；推断内容必须在 `preferences.notes` 中标注来源状态，不得伪装成用户明确偏好。
 
 ## Research 到 Candidate Pool
 
@@ -59,6 +71,8 @@
 6. **最终行程（Final Itinerary）**：仅用户确认路线后，才把胜出候选转为正式 `itineraryItems`，每个节点补齐明确的 `startTime` 与 `endTime`。
 
 候选池在会话中以区域摘要形式展示：每个区域列出胜出候选、落选原因（可选）与备选，等待用户确认路线。用户确认前的候选不构成正式行程，不得写入 TravelPack。
+
+用户确认路线后，落选但仍具参考价值的候选写入 TravelPack 1.2 的 `alternatives[]`：`relatedRef` 指向被对比对象，`status` 取 `available`、`selected`、`rejected` 或 `needs-recheck`，`reason` 只写一句简短用户可理解理由，`sourceIds` 指向真实 `sources[]`。
 
 ## 约束感知规划
 
@@ -80,8 +94,9 @@
    - "浅草和上野安排在同一天，因为位于相邻区域，可以减少跨区移动。"
    - "保留 19:30 的餐厅预约，因此下午行程提前结束。"
 3. 禁止保存或展示模型隐藏推理过程或 chain-of-thought；planning reason 是面向用户的结论摘要，不是推理日志。
-4. planning reason 展示在逐日草案与用户确认阶段；用户确认后随行程备注保存（复用 TravelPack 1.1 的 `itineraryItems[].notes` 或 `materials` 攻略类条目），不新增 schema 字段。
-5. 后续 TravelPack 1.2 将增加 `decisionLog`；Phase 1 只定义上述行为与数据需求，不修改 `schemaVersion`。
+4. planning reason 展示在逐日草案与用户确认阶段；用户确认后写入 TravelPack 1.2 的 `decisionLog[]`（`kind`、`relatedRefs[]`、`reason`、`createdAt`），行程节点备注仍可保留简短版本。
+5. `decisionLog[].reason` 只写简短结论与依据，字段定义与长度约束见 [TravelPack 1.2](travelpack-1.2.md)，schema 细节不在本文件重复。
+6. 未进入最终行程的候选与备选写入 `alternatives[]`；硬约束写入 `constraints[]`；软偏好写入 `preferences`。三类内容禁止混写。
 
 ## 缺失信息检查
 

@@ -1,6 +1,15 @@
 # 动态重规划：local-replan 与 full-plan 规则
 
-本文件定义 [SKILL 工作流](../SKILL.md) 的动态重规划阶段。重规划输出遵循 [TravelPack 1.1](travelpack-1.1.md) 与 [规划智能规则](planning-intelligence.md)，不修改 schema。
+本文件定义 [SKILL 工作流](../SKILL.md) 的动态重规划阶段。重规划输出遵循 [TravelPack 1.2](travelpack-1.2.md) 与 [规划智能规则](planning-intelligence.md)；1.1 契约见 [TravelPack 1.1](travelpack-1.1.md)。字段细节以 [travelpack-1.2.md](travelpack-1.2.md) 为准，本文件不重复定义 schema。
+
+local-replan 输出必须更新以下结构：
+
+- `replanHistory[]`：**必填**，每次 local-replan 追加一条记录（`trigger`、`createdAt`、`status`、`affectedDayIds[]`、`affectedRefs[]`、`preservedRefs[]`、`summary`）。
+- `decisionLog[]`：必要时要追加本次重规划的简短结论（如天气改道、偏好取舍）。
+- `alternatives[]`：采用或放弃替代方案时更新对应条目 `status`。
+- `planningMeta.lastPlannedAt`：记录最近一次重规划时间；`planningMeta.mode` 使用 `local-replan`。
+
+本阶段只改数据契约，**不修改前端**：新增字段由前端安全忽略，重规划不要求 UI 同步改造。
 
 ## 模式区分
 
@@ -27,7 +36,7 @@
 6. **只重新规划最小受影响范围**：变更后的逐日草案只包含被修改的日期与节点；其余日期原样保留。
 7. **Constraint Check**：重规划结果必须通过全部 Hard Constraint；与 Soft Preference 的冲突在变更摘要中说明取舍理由。
 8. **向用户展示修改摘要**：摘要只包含触发原因、受影响日期、被修改的节点、被保留的节点、未解决的待核验项。禁止把整份行程重新贴给用户。
-9. **用户确认后应用**：确认后输出完整 TravelPack（保留全部稳定 ID，按 [SKILL.md 更新现有旅行](../SKILL.md) 规则处理增删）。用户未确认前保持原行程不变。
+9. **用户确认后应用**：确认后输出完整 TravelPack（保留全部稳定 ID，按 [SKILL.md 更新现有旅行](../SKILL.md) 规则处理增删）。用户未确认前保持原行程不变。同时在 `replanHistory[]` 记录本次重规划：已应用使用 `status = "applied"`，仅提出建议使用 `proposed`，用户放弃使用 `cancelled`。
 
 ## 受影响范围判定
 
@@ -61,3 +70,15 @@
 - 待确认：需要用户决定的取舍项。
 
 禁止在摘要中展示推理日志、候选淘汰过程或模型内部状态；只保留用户可理解的结论（规则同 [规划智能：可解释规划](planning-intelligence.md)）。
+
+摘要与 `replanHistory[].summary` 内容一致，并遵循以下映射：
+
+| 摘要段落 | 结构化字段 |
+|---|---|
+| 触发 | `replanHistory[].trigger`、`createdAt` |
+| 受影响 | `replanHistory[].affectedDayIds[]`、`affectedRefs[]` |
+| 保留 | `replanHistory[].preservedRefs[]` |
+| 待核验 | `sources[]` freshness 与待办项 |
+| 待确认 | `replanHistory[].status = "proposed"` |
+
+被删除对象的 ID 已不存在，不得写入 `affectedRefs[]`；改为引用仍存在的 `place` 或 `day`。
