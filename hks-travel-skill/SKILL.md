@@ -69,6 +69,18 @@ Phase 1 定义的智能行为落到以下结构：
 - 现有前端不消费新增字段，但必须能安全忽略；新增字段不得使既有页面崩溃。
 - 字段细节统一以 [travelpack-1.2.md](references/travelpack-1.2.md) 为准，1.1 契约继续作为 legacy compatibility 文档存在。
 
+## 产品信息架构（Phase 3 冻结）
+
+一级导航**始终为 5 项**：概览 / 行程 / 准备 / 记账 / 资料。完整交互骨架见 [产品 UX 架构 v1](references/product-ux-v1.md)。
+
+- 「概览」继承原「出行」的交通与住宿能力（票面、分段、时间节点、票据、附件、编辑与清空），改名不得删除功能。
+- **地图不是一级模块**，它是「行程」内部的第二种视图（行程 / 地图切换）。
+- **AI Copilot 不是一级模块**，它是全局能力（浮动入口 + Bottom Sheet）；请求结构与无宿主时的兜底见 [Agent Bridge](references/agent-bridge.md)。
+- 新增能力通过模块内入口或全局能力实现，禁止新增一级 Tab，产品不得变成七个底部 Tab。
+- TravelPack 1.2 字段到界面的映射：`preferences` → 旅行偏好，`constraints[]` → 已锁定安排，`decisionLog[]` → AI 安排理由，`alternatives[]` → 换一个，`replanHistory[]` → AI 最近调整，`planningMeta` → 待复核信息快照，`tripStatus` → 旅行状态文案。
+- 界面使用「AI 安排理由」「已锁定安排」等用户语言，不出现 Hard Constraint、Decision Log、Reasoning、Chain of Thought 等内部术语。
+- `schemaVersion = "1.1.0"` 时新的消费能力自动隐藏，五个模块必须继续正常工作。
+
 ## 动态重规划
 
 行程确认部署后，用户旅行中出现变化时按 [动态重规划](references/dynamic-replanning.md) 执行：
@@ -123,3 +135,4 @@ Phase 1 定义的智能行为落到以下结构：
 - 每次正式部署和升级都发布不含凭据的 `travel-app-manifest.json`。新版 Skill 不自动修改既有网站；用户指定目标网站后，Agent 按升级协议更新原项目。禁止用新应用静默替代原域名，禁止在纯代码升级中重写线上 TravelPack。
 - planning reason 只写简短用户可理解的结论与依据；模型隐藏推理与 chain-of-thought 不保存、不展示、不写入 TravelPack。
 - TravelPack 1.2 只做加法：不删除、不重命名、不改变 1.1 字段语义；新增字段不得承载凭据、Key、Cookie、Token 或 chain-of-thought。
+- 网页只生成结构化调整请求：宿主提供 `requestAgentUpdate()` 时交给宿主，未提供时给出可复制的 Skill 请求。前端禁止保存模型 Key、硬编码模型接口或绕过 Skill 直接调用模型；网页不得暗示自己已完成重规划。
