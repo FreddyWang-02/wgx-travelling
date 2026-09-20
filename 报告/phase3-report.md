@@ -20,6 +20,7 @@
 - 隐私审计：`{"safe": true, "filesScanned": 84}`
 - 基线确认：改动前 `npm run check` = 30 pass / 0 fail，audit safe（78 files）——**基线通过后才开始开发**
 - 浏览器验收：桌面 1440×900 + 移动端 390×844，全部模块通过，无页面级横向溢出
+- **验收截图已随仓库提交**：`docs/screenshots/phase3/`（8 张桌面端 + 6 张移动端 + 1 张合成总览图）
 - 未改 TravelPack schema；未迁框架；未新增依赖；未引入动效库
 - 分支已 push，**未合并 main**
 - 报告与交接文档已生成；**未进入 Phase 4**
@@ -322,20 +323,41 @@ hasAgentBridge(adapter) // typeof adapter?.requestAgentUpdate === "function"
 
 同样可正常打开：概览与票面正常，新能力静默隐藏，无报错、无溢出。
 
-### 截图路径（临时，未提交 Git）
+### 截图（已随仓库提交）
 
-```text
-/tmp/phase3-shots/desktop-01-overview.png      /tmp/phase3-shots/mobile-01-overview.png
-/tmp/phase3-shots/desktop-02-itinerary-list.png /tmp/phase3-shots/mobile-02-itinerary-list.png
-/tmp/phase3-shots/desktop-03-itinerary-map.png  /tmp/phase3-shots/mobile-03-itinerary-map.png
-/tmp/phase3-shots/desktop-04-alternatives.png   /tmp/phase3-shots/mobile-04-copilot.png
-/tmp/phase3-shots/desktop-05-copilot.png
-/tmp/phase3-shots/desktop-06-prepare.png
-/tmp/phase3-shots/desktop-07-budget.png
-/tmp/phase3-shots/desktop-08-materials.png
-```
+全部截图位于 `docs/screenshots/phase3/`，来自同一份最终构建，未做后期裁剪。完整清单与逐张说明见 `docs/screenshots/phase3/README.md`。
 
-按要求不把临时截图提交仓库。
+**一张图看完**（8 张桌面端 + 6 张移动端合成，适合整体转交）：
+
+![Phase 3 界面验收总览](../docs/screenshots/phase3/contact-sheet.png)
+
+#### 桌面端 1440 × 900
+
+| 概览 Overview | 行程 · 行程视图 |
+|---|---|
+| ![概览](../docs/screenshots/phase3/desktop-01-overview.png) | ![行程视图](../docs/screenshots/phase3/desktop-02-itinerary-list.png) |
+
+| 行程 · 地图视图 | 换一个（alternatives） |
+|---|---|
+| ![地图视图](../docs/screenshots/phase3/desktop-03-itinerary-map.png) | ![换一个](../docs/screenshots/phase3/desktop-04-alternatives.png) |
+
+| AI Copilot 变更请求 | 准备 Prepare |
+|---|---|
+| ![Copilot](../docs/screenshots/phase3/desktop-05-copilot.png) | ![准备](../docs/screenshots/phase3/desktop-06-prepare.png) |
+
+| 记账 Budget | 资料 Materials |
+|---|---|
+| ![记账](../docs/screenshots/phase3/desktop-07-budget.png) | ![资料](../docs/screenshots/phase3/desktop-08-materials.png) |
+
+#### 移动端 390 × 844
+
+| 概览 | 行程视图 | 地图视图 | AI Copilot |
+|---|---|---|---|
+| ![移动概览](../docs/screenshots/phase3/mobile-01-overview.png) | ![移动行程](../docs/screenshots/phase3/mobile-02-itinerary-list.png) | ![移动地图](../docs/screenshots/phase3/mobile-03-itinerary-map.png) | ![移动 Copilot](../docs/screenshots/phase3/mobile-04-copilot.png) |
+
+| 记账 | 准备 | | |
+|---|---|---|---|
+| ![移动记账](../docs/screenshots/phase3/mobile-05-budget.png) | ![移动准备](../docs/screenshots/phase3/mobile-06-prepare.png) | | |
 
 ---
 

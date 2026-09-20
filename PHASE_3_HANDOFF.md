@@ -66,7 +66,7 @@ Present → 「交给当前 Agent 处理」. Absent → 「复制调整请求」
 
 - 56 tests pass; audit clean; both schema versions still validate and build.
 - Browser: overview, five-module nav, itinerary list, itinerary map, locked constraint, AI reason, 换一个, copilot sheet, quick action, fallback request, AI recent changes, prepare, budget, materials — all checked at desktop and 390px. No horizontal overflow in any module; no page errors beyond the pre-existing `favicon.ico` 404.
-- Screenshots (not committed, temporary): `/tmp/phase3-shots/`.
+- Screenshots are committed under `docs/screenshots/phase3/` (8 desktop at 1440×900, 6 mobile at 390×844). `contact-sheet.png` combines all of them for one-shot handover; `README.md` in that folder captions each file. The three pre-existing Phase 0 screenshots in `docs/screenshots/` are untouched.
 
 ## Open Questions
 
