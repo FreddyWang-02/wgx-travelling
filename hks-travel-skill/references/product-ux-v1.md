@@ -86,7 +86,7 @@
 |---|---|---|
 | Constraint Lock | `constraints[]` 中 `status = active` 且 `relatedRefs` 命中该节点 | 卡片头部轻量 🔒；卡片内一句「已锁定安排，AI 调整时不会自动移动。」 |
 | Explainable Planning | `decisionLog[]` 的 `relatedRefs` 命中 item / day / place | 「✨ AI 安排理由」+ 短理由 |
-| Alternatives | `alternatives[]` 的 `relatedRef` 命中 item 或 place | 「换一个」入口 → 轻量选择面板 |
+| Alternatives | `alternatives[]` 的 `relatedRef` 命中 item 或 place | 入口按钮 → 轻量选择面板（`available` 显示「换一个」，只剩 `selected` 显示「重新选择」） |
 | Day-level adjustment | `dayId` | 当日主题旁的「✨ 调整这一天」 |
 
 文案纪律：界面统一使用「AI 安排理由」。**不出现** Decision Log / Reasoning / Chain of Thought 等字样，也不展示内部推理。
@@ -130,7 +130,7 @@
 |---|---|
 | 出发前 30 天 | 距出发 ≥ 30 天 |
 | 出发前 7 天 | 距出发 7–29 天 |
-| 出发前 1 天 | 距出发 1–6 天 |
+| 出发前一周内 | 距出发 1–6 天 |
 | 旅行中 | 日期落在旅行区间内 |
 | 旅行后 | 日期晚于结束日 |
 | 待排期 | 没有 `dueAt` |

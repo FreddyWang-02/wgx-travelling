@@ -29,7 +29,9 @@ import {
   recheckSnapshot,
   replanSummaries,
   sourceFreshness,
+  swapEntryLabel,
   swapRequestText,
+  taskPhase,
   tripStatusLabel,
 } from "../hks-travel-skill/assets/frontend-template/ux.mjs";
 
@@ -179,6 +181,17 @@ test("alternatives are associated with the current itinerary item", () => {
   // 选择替代方案只生成变更请求，不直接改写数据。
   assert.match(swapRequestText({ title: "X", reason: "因为更近。" }, "景山公园"), /请把「景山公园」换成「X」，理由：因为更近。/);
   assert.match(appSource, /网页不会直接改写整份旅行数据/);
+  // 入口按钮语义跟随相关备选状态，数据逻辑与请求行为不变。
+  assert.equal(swapEntryLabel(alternativesFor(pack12, { itineraryItemId: "item-jingshan", placeId: "place-jingshan" })), "换一个");
+  assert.equal(swapEntryLabel(alternativesFor(pack12, { itineraryItemId: "item-lama-visit", placeId: "place-lama" })), "重新选择");
+  assert.equal(pack12.alternatives.find((entry) => entry.id === "alternative-lama-rain").status, "selected");
+  assert.equal(pack12.alternatives.find((entry) => entry.id === "alternative-jingshan-skip").status, "available");
+  assert.equal(swapEntryLabel([]), "换一个");
+  assert.equal(swapEntryLabel([{ status: "rejected" }]), "换一个");
+  assert.equal(swapEntryLabel([{ status: "needs-recheck" }]), "换一个");
+  assert.equal(swapEntryLabel([{ status: "selected" }, { status: "available" }]), "换一个", "还有可选方案时优先显示换一个");
+  assert.equal(swapEntryLabel([{ status: "rejected" }, { status: "selected" }]), "重新选择");
+  assert.match(appSource, /esc\(swapEntryLabel\(swaps\)\)/);
 });
 
 test("replanHistory produces user-readable summaries", () => {
@@ -333,7 +346,13 @@ test("budget calculations are unchanged and summaries are derived", () => {
 
 test("prepare regroups tasks by departure phase without new schema fields", () => {
   const groups = groupTasksByPhase(pack12);
-  assert.deepEqual(groups.map((group) => group.phase), ["出发前 7 天", "出发前 1 天", "旅行中", "待排期"]);
+  assert.deepEqual(groups.map((group) => group.phase), ["出发前 7 天", "出发前一周内", "旅行中", "待排期"]);
+  // 分桶边界不变，仅展示文案更准确：距出发 1–6 天归入「出发前一周内」。
+  assert.equal(taskPhase("2026-09-14", pack12.trip), "出发前一周内");
+  assert.equal(taskPhase("2026-09-13", pack12.trip), "出发前 7 天");
+  assert.equal(taskPhase("2026-09-08", pack12.trip), "出发前 7 天");
+  assert.equal(taskPhase("2026-08-20", pack12.trip), "出发前 30 天");
+  assert.equal(taskPhase("2026-09-22", pack12.trip), "旅行中");
   assert.equal(groups.reduce((sum, group) => sum + group.tasks.length, 0), pack12.tasks.length);
   assert.match(appSource, /groupTasksByPhase/);
   assert.match(appSource, /行李里，别忘了/);

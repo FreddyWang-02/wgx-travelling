@@ -144,7 +144,7 @@ Copilot 是「随时能把当前处境交给 Agent」的入口，属于**跨模�
 | `preferences` | 概览「你的旅行偏好」chip（pace / 步行 / 人群 / 预算 / interests）+ 用户说明 | 点「编辑偏好」进入既有旅程编辑 |
 | `constraints[]` | 概览「🔒 已锁定安排」；行程卡片头部轻量 🔒 + 「已锁定安排，AI 调整时不会自动移动。」 | 界面不出现 Hard Constraint 字样 |
 | `decisionLog[]` | 「✨ AI 安排理由」+ 短理由 + 类型标签 | 当日理由显示在当日区，节点理由显示在卡片内，不重复 |
-| `alternatives[]` | 卡片「换一个」→ 轻量选择面板（title / reason / status / 来源数） | 选择后**生成变更请求**，不改写数据 |
+| `alternatives[]` | 卡片入口按钮 → 轻量选择面板（title / reason / status / 来源数） | 按钮语义跟随状态：还有 `available` 显示「换一个」，只剩 `selected` 显示「重新选择」；选择后**生成变更请求**，不改写数据 |
 | `replanHistory[]` | 概览「AI 最近调整」（触发文案 / 状态 / 受影响日期 / 摘要） | 用户语言，不展示内部 ID |
 | `planningMeta` | 概览状态条的待复核数量（快照措辞） | `overallConfidence` 不面向普通用户 |
 | `tripStatus` | 概览状态条「旅行状态」 | 中文文案，不显示枚举 |
@@ -295,12 +295,12 @@ hasAgentBridge(adapter) // typeof adapter?.requestAgentUpdate === "function"
 | 行程 Map | 通过（全宽绘制地图、编号标记、地点详情卡） |
 | locked constraint | 通过（卡片 🔒 + 锁定说明；地点级约束同样生效） |
 | AI 安排理由 | 通过（当日区 1 条，节点卡不重复） |
-| 换一个 | 通过（面板显示 title / reason / status / 来源数） |
+| 换一个 / 重新选择 | 通过（面板显示 title / reason / status / 来源数；`available` 的节点显示「换一个」，`selected` 的节点显示「重新选择」） |
 | AI Copilot Bottom Sheet | 通过 |
 | quick action | 通过（6 个，选中态 + 自动填充文本） |
 | fallback request | 通过（模式「复制给 Skill Agent」+ 提示） |
 | AI 最近调整 | 通过（2 条，触发/状态/日期/摘要） |
-| 准备 | 通过（出发前 7 天 / 出发前 1 天 / 旅行中 / 待排期 + 行李） |
+| 准备 | 通过（出发前 7 天 / 出发前一周内 / 旅行中 / 待排期 + 行李） |
 | 记账 | 通过（已花 / 应收合计 / 应付合计 + 个人汇总 + 结算建议） |
 | 资料 | 通过（5 条资料 + 2 条来源，已过期 / 当前有效） |
 | 横向溢出 | 0 |
@@ -423,11 +423,11 @@ hasAgentBridge(adapter) // typeof adapter?.requestAgentUpdate === "function"
 
 1. **浮动入口在中途滚动位置仍会压在内容上**（已通过底部留白保证关键操作可滚出）。折叠/隐藏式悬浮按钮需要 Phase 4 决定。
 2. **`preferences` 没有独立编辑器**：点「编辑偏好」进入既有旅程编辑弹窗，未做轻量偏好设置中心。
-3. **准备阶段的第三档标签**按需求写作「出发前 1 天」，实际区间是距出发 1–6 天；如需更准确可改为「出发前一周内」。
+3. **准备阶段第三档文案已在合并前修正**：原写作「出发前 1 天」（实际区间距出发 1–6 天，语义不准），现为「出发前一周内」；**分桶边界与计算逻辑未变**（见 commit `fix: refine Phase 3 UX labels`）。
 4. **记账首页摘要**只放 已花 / 应收合计 / 应付合计；逐人的个人应摊 / 实际支付 / 应收应付保留在「个人汇总」子 Tab，未在首屏重复一份逐人区块。
 5. **`replanHistory` 只在概览展示**，行程页未按当天展示相关调整记录。
 6. **六套风格中只对默认 `aviation` 做了截图验收**；其余五套与深色模式共用同一组变量，但未逐套截图。
-7. **`alternatives` 中 `status = "selected"` 的条目仍显示「换一个」**（允许用户改回），但按钮语义可再斟酌。
+7. **`alternatives` 入口按钮语义已在合并前修正**：相关备选中还有 `available` 时显示「换一个」，只剩 `selected`（已采用）时显示「重新选择」；面板内每个选项的「生成变更请求」与 Agent request 行为未变。
 
 ---
 

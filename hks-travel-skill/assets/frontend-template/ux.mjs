@@ -210,6 +210,15 @@ export function alternativeStatusLabel(status) {
   return ALTERNATIVE_STATUS_LABELS[status] || status || "可选";
 }
 
+// 入口按钮语义跟随相关备选的状态：
+// 还有可选方案 → 「换一个」；只剩已采用的方案 → 「重新选择」。
+export function swapEntryLabel(list) {
+  const alternatives = Array.isArray(list) ? list : [];
+  if (alternatives.some((entry) => entry?.status === "available")) return "换一个";
+  if (alternatives.some((entry) => entry?.status === "selected")) return "重新选择";
+  return "换一个";
+}
+
 export function replanSummaries(pack, dayLookup = () => null) {
   const list = Array.isArray(pack?.replanHistory) ? pack.replanHistory : [];
   return list.map((entry) => {
@@ -227,7 +236,8 @@ export function replanSummaries(pack, dayLookup = () => null) {
   });
 }
 
-export const TASK_PHASE_ORDER = ["出发前 30 天", "出发前 7 天", "出发前 1 天", "旅行中", "旅行后", "待排期"];
+// 分桶边界不变：仅用户展示文案从「出发前 1 天」改为更准确的「出发前一周内」。
+export const TASK_PHASE_ORDER = ["出发前 30 天", "出发前 7 天", "出发前一周内", "旅行中", "旅行后", "待排期"];
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const toDate = (value) => (typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value) ? new Date(`${value}T00:00:00Z`) : null);
@@ -244,7 +254,7 @@ export function taskPhase(dueDate, trip) {
   const daysBefore = dayDiff(start, due);
   if (daysBefore >= 30) return "出发前 30 天";
   if (daysBefore >= 7) return "出发前 7 天";
-  return "出发前 1 天";
+  return "出发前一周内";
 }
 
 export function groupTasksByPhase(pack) {

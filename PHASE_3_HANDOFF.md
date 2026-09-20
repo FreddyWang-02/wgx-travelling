@@ -72,11 +72,11 @@ Present → 「交给当前 Agent 处理」. Absent → 「复制调整请求」
 
 1. **Reserved space for the floating entry.** Bottom padding gives clearance, but a fixed button still floats over content at intermediate scroll positions. A collapse-on-scroll behaviour would need a Phase 4 decision.
 2. **`preferences` editing** currently opens the existing trip editor. A dedicated lightweight preference editor is not built.
-3. **Prepare phases use threshold buckets** (≥30 / 7–29 / 1–6 days, during, after, unscheduled). The third bucket is labelled 出发前 1 天 per the brief; renaming to 出发前一周内 may read better.
+3. **Prepare phase buckets** use thresholds (≥30 / 7–29 / 1–6 days, during, after, unscheduled). The 1–6 day bucket is labelled 出发前一周内 (renamed from 出发前 1 天 before merge; boundaries unchanged).
 4. **Budget shows 已花 / 应收合计 / 应付合计** on the module home; per-person 个人应摊 / 实际支付 / 应收应付 stays in the 个人汇总 sub-tab rather than duplicating a second per-person block above the fold.
 5. **`replanHistory` surfaces on 概览 only.** Per-day context is not shown on the itinerary page.
 6. **Six style variants are untouched.** The new layout is verified in the default `aviation` style; the other five and dark mode share the same variables but were not screenshot-verified in this phase.
-7. **`alternatives` with `status: "selected"` still offer 换一个.** Intentional (a user may want to revert) but arguably should be labelled differently.
+7. **Alternatives entry button is status-aware**: 「换一个」 while an `available` option exists, 「重新选择」 once only `selected` options remain. Panel actions and the agent request behaviour are unchanged.
 
 ## Phase 4 Entry Conditions
 

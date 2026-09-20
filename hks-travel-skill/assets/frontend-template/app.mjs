@@ -50,6 +50,7 @@ import {
   recheckSnapshot,
   replanSummaries,
   sourceFreshness,
+  swapEntryLabel,
   swapRequestText,
   tripStatusLabel,
   upcomingTransport,
@@ -519,7 +520,7 @@ function itineraryStopCard(item) {
       ${hasExtras ? `<div class="stop-extras">
         ${locked ? `<p class="stop-lock">🔒 已锁定安排，AI 调整时不会自动移动。</p>` : ""}
         ${planningReasonsMarkup(reasons)}
-        ${swaps.length ? `<button class="text-button stop-swap" data-open-alternatives="${esc(item.id)}">${icon("shuffle")} 换一个 <span class="swap-count">${swaps.length}</span></button>` : ""}
+        ${swaps.length ? `<button class="text-button stop-swap" data-open-alternatives="${esc(item.id)}">${icon("shuffle")} ${esc(swapEntryLabel(swaps))} <span class="swap-count">${swaps.length}</span></button>` : ""}
       </div>` : ""}
       ${hasDetails ? `<details class="place-details"><summary>查看地点详情与攻略</summary><div class="place-detail-body">${place?.address ? `<p>${icon("map-pin")} ${esc(place.address)}</p>` : ""}${links.length ? `<div class="place-links">${links.map((link) => `<a href="${esc(link.safe)}" target="_blank" rel="noopener noreferrer">${esc(link.title || "攻略链接")} ${icon("arrow-up-right")}</a>`).join("")}</div>` : ""}</div></details>` : ""}
     </div>
