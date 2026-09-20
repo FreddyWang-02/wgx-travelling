@@ -428,3 +428,35 @@ THIRD_PARTY_NOTICES.md                                        Caveat / Nunito �
 - 没有改动任一既有 sample 文件。
 - 没有引入任何 npm 依赖、外部 CDN 或第三方 JS 库。
 - 没有把资产母版用作页面素材。
+
+
+---
+
+## 22. Git 记录
+
+分支：`phase4a-homepage-visual`，基于 `main` = `cb45788`（Phase 3 merge commit）。
+
+| commit | 说明 |
+| --- | --- |
+| `9e4b3af` | `docs: define Sunny Travel Storybook design system` |
+| `4ea9e20` | `feat: add animated travel companions and homepage art assets` |
+| `ae298a9` | `feat: redesign the adaptive travel homepage` |
+| `d325052` | `test: cover the storybook homepage contract` |
+| `23904d9` | `docs: add Phase 4A handoff, report and acceptance screenshots` |
+
+- **push 状态**：已推送到 `origin/phase4a-homepage-visual`，本地与远端一致（`23904d9`）。
+- **main 状态**：未改动，未合并。`git status` 在推送后为 clean。
+- 远端提示的 PR 地址（本阶段按要求**没有**创建 PR）：
+  `https://github.com/FreddyWang-02/wgx-travelling/pull/new/phase4a-homepage-visual`
+
+### 收尾时的门禁结果
+
+```
+npm run check
+→ audit: { "safe": true, "filesScanned": 156 }
+→ tests: 76 pass / 0 fail / 0 skipped
+```
+
+`filesScanned` 从 Phase 3 的基线增加到 156，包含本阶段新增的 33 个文件
+（1 篇 DESIGN、3 个首页模块、23 个 SVG、2 个字体、1 个样本、1 个测试、2 篇文档、
+16 张截图与 2 个 README）。

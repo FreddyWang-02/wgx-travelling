@@ -105,3 +105,20 @@ node hks-travel-skill/scripts/serve_ui_preview.mjs /tmp/p4a --port 4179
 - 继续走"加法"：新风格、新字段、新资产都不得让旧数据或旧风格失效。
 - 动效沿用 Motion Map 的 token 与"只动 transform / opacity"的约束。
 - 仍然不要动 `docs/screenshots/` 根目录下 Phase 0 的三张图（`tests/skill.test.mjs` 会断言它们存在）。
+
+
+---
+
+## 8. Git 状态
+
+| commit | 说明 |
+| --- | --- |
+| `9e4b3af` | `docs: define Sunny Travel Storybook design system` |
+| `4ea9e20` | `feat: add animated travel companions and homepage art assets` |
+| `ae298a9` | `feat: redesign the adaptive travel homepage` |
+| `d325052` | `test: cover the storybook homepage contract` |
+| `23904d9` | `docs: add Phase 4A handoff, report and acceptance screenshots` |
+
+- 分支 `phase4a-homepage-visual` 已推送到 `origin`，与远端一致；**main 未改动、未合并**。
+- 收尾门禁：`npm run check` → audit `safe: true` / `filesScanned: 156`，76 pass / 0 fail。
+- 按阶段要求**没有创建 PR**，等视觉审核通过后再决定合并方式。
