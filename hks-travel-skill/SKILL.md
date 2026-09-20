@@ -37,7 +37,7 @@ description: AI Travel Copilot built on Hks-Travel-Skill. Runs the trip-planning
     node scripts/serve_ui_preview.mjs <output-directory> --port 0
     ```
 
-    第二条命令会输出 `http://127.0.0.1:<port>/`。必须用宿主浏览器或浏览器工具打开该 HTTP URL；禁止把 `index.html` 作为普通文件展示，禁止使用 `file://` 完成 UI 审核。确认页面已退出"正在打开旅行票夹"状态后，实际点击风格按钮，并至少切换两种风格验证交互。随后向用户展示航空票夹、自然手账、极简导览，以及处于出行模块先行审核阶段的拼贴裁纸、印刷、都市设计六种 UI。宿主无法打开本地 HTTP 地址时，为六种风格分别生成真实浏览器截图并明确说明降级原因；禁止要求用户根据风格名称盲选。等待用户明确选择后把 `appearance.styleId` 写入 TravelPack。生成预览不代表用户已选择，UI 未确认时不得正式部署。
+    第二条命令会输出 `http://127.0.0.1:<port>/`。必须用宿主浏览器或浏览器工具打开该 HTTP URL；禁止把 `index.html` 作为普通文件展示，禁止使用 `file://` 完成 UI 审核。确认页面已退出"正在打开旅行票夹"状态后，实际点击风格按钮，并至少切换两种风格验证交互。随后向用户展示晴日手账、航空票夹、自然手账、极简导览，以及处于先行审核阶段的拼贴裁纸、印刷、都市设计七种 UI。晴日手账（`storybook`）是 Phase 4A 起的默认方向，它的首页版式见仓库根目录 `DESIGN.md`，而航空票夹的票夹构图仍然原样保留。宿主无法打开本地 HTTP 地址时，为七种风格分别生成真实浏览器截图并明确说明降级原因；禁止要求用户根据风格名称盲选。等待用户明确选择后把 `appearance.styleId` 写入 TravelPack。生成预览不代表用户已选择，UI 未确认时不得正式部署。
 11. 按 [TravelPack 1.2](references/travelpack-1.2.md) 输出完整 JSON（新旅行默认 `schemaVersion = "1.2.0"`；继续维护既有 1.1 数据时保持 `"1.1.0"`，legacy 契约见 [TravelPack 1.1](references/travelpack-1.1.md)），并执行：
 
     ```bash

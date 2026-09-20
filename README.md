@@ -8,7 +8,7 @@ Research · Plan · Deploy · Upgrade · Redesign.
 > **Note:** This is Phase 0 of an evolution from Hks-Travel-Skill into AI Travel Copilot.
 > See [MIGRATION_PLAN.md](MIGRATION_PLAN.md) for the roadmap.
 
-Hks-Travel-Skill 是一个面向 Codex 与兼容 Agent 的旅行攻略 Skill。它把目的地研究、路线确认、六种 UI 风格预览、TravelPack 数据生成、可编辑网站部署和既有网站安全升级连成完整工作流。
+Hks-Travel-Skill 是一个面向 Codex 与兼容 Agent 的旅行攻略 Skill。它把目的地研究、路线确认、七种 UI 风格预览、TravelPack 数据生成、可编辑网站部署和既有网站安全升级连成完整工作流。
 
 当前版本：`4.12.0`<br>
 Skill ID：`hks-travel-skill`
@@ -32,7 +32,7 @@ Skill ID：`hks-travel-skill`
 ## 能力
 
 - 按偏好研究目的地、交通、住宿区域、预约规则和季节变化，并保留来源与核验时间。
-- 在正式部署前展示航空票夹、自然手账、极简导览、拼贴裁纸、印刷和都市六种 UI 风格。
+- 在正式部署前展示晴日手账、航空票夹、自然手账、极简导览、拼贴裁纸、印刷和都市七种 UI 风格。
 - 生成并验证 TravelPack 1.1.0。
 - 交付“出行、行程、准备、记账、资料”五模块旅行网站。
 - 支持鼠标和触摸拖拽、待办、日历导出、AA 记账、附件与只读分享。

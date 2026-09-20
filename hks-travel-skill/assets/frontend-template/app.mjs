@@ -55,6 +55,14 @@ import {
   tripStatusLabel,
   upcomingTransport,
 } from "./ux.mjs";
+// Phase 4A · Sunny Travel Storybook 首页：纯逻辑在 assets/home/home-ux.mjs，
+// 资产取回在 assets/home/home-assets.mjs，app.mjs 只负责把这二者接到 DOM 上。
+import {
+  STORYBOOK_STYLE_ID,
+  homeFocusDay,
+  storybookHomeMarkup,
+} from "./assets/home/home-ux.mjs";
+import { loadHomeAssets } from "./assets/home/home-assets.mjs";
 
 const state = {
   pack: null,
@@ -92,6 +100,10 @@ const state = {
   copilotAction: null,
   copilotText: "",
   copilotSource: null,
+  // Phase 4A：首页焦点日与已内联的生产资产（场景 / 角色 / 涂鸦）。
+  homeDayId: null,
+  homeAssets: null,
+  homeAssetsRequest: null,
 };
 
 const $ = (selector) => document.querySelector(selector);
@@ -196,6 +208,7 @@ const labels = {
 };
 
 const styleLabels = {
+  storybook: "晴日手账",
   aviation: "航空票夹",
   natural: "自然手账",
   minimal: "极简导览",
@@ -203,6 +216,9 @@ const styleLabels = {
   print: "印刷风",
   urban: "都市设计",
 };
+// Phase 4A 起，新旅行的默认视觉方向是 Sunny Travel Storybook 首页；
+// 数据里已记录 appearance.styleId 的旅行仍然按记录走。
+const DEFAULT_STYLE = STORYBOOK_STYLE_ID;
 
 function refreshIcons() {
   window.lucide?.createIcons({ attrs: { "aria-hidden": "true" } });
@@ -305,6 +321,7 @@ function renderShell() {
   const fab = $("#copilotFab");
   if (fab) fab.hidden = false;
   document.title = `${trip.title}｜旅行票夹`;
+  document.body.dataset.viewTab = state.tab;
   document.querySelectorAll("[data-tab]").forEach((button) => button.classList.toggle("active", button.dataset.tab === state.tab));
 }
 
@@ -376,6 +393,70 @@ function overviewTransportSection() {
 }
 
 function overviewView() {
+  return isStorybookHome() ? storybookHomeView() : classicOverviewView();
+}
+
+function activeStyleId() {
+  return document.documentElement.dataset.style || DEFAULT_STYLE;
+}
+
+function isStorybookHome() {
+  return activeStyleId() === STORYBOOK_STYLE_ID;
+}
+
+// 首页生产资产只取一次；失败时不阻塞渲染，版式退化为主题色面。
+async function ensureHomeAssets() {
+  if (state.homeAssets || !isStorybookHome()) return state.homeAssets;
+  if (!state.homeAssetsRequest) {
+    state.homeAssetsRequest = loadHomeAssets()
+      .then((assets) => {
+        state.homeAssets = assets;
+        return assets;
+      })
+      .catch(() => null);
+  }
+  return state.homeAssetsRequest;
+}
+
+// Sunny Travel Storybook 首页：Hero 明信片 + 今日旅程 + 为什么 + 已锁定 + 状态 + 别错过，
+// 末尾接上 Phase 3 的出行票据能力，概览对「出行」模块的继承没有中断。
+function storybookHomeView() {
+  const markup = storybookHomeMarkup(state.pack, {
+    assets: state.homeAssets || {},
+    now: localNow(),
+    mode: state.mode,
+    dayId: state.homeDayId,
+  });
+  return `<section class="view sb-view">${markup}<section class="sb-tickets">${transportPanelSection()}</section></section>`;
+}
+
+// 滚动揭示：默认可见，只有观察器真的挂上之后才进入「待揭示」状态。
+let homeRevealObserver = null;
+
+function setupHomeReveal() {
+  homeRevealObserver?.disconnect();
+  homeRevealObserver = null;
+  const home = document.querySelector(".sb-home");
+  if (!home) return;
+  const targets = [...new Set(home.querySelectorAll(".sb-section, .sb-inspiration"))];
+  if (!targets.length) return;
+  if (!("IntersectionObserver" in window)) {
+    targets.forEach((element) => element.classList.add("is-visible"));
+    return;
+  }
+  home.classList.add("sb-motion-ready");
+  homeRevealObserver = new IntersectionObserver((entries) => {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+      entry.target.classList.add("is-visible");
+      homeRevealObserver?.unobserve(entry.target);
+    }
+  }, { rootMargin: "0px 0px -10% 0px", threshold: 0.08 });
+  targets.forEach((element) => homeRevealObserver.observe(element));
+}
+
+// Phase 3 的概览版式原样保留：storybook 之外的六套 style 仍然走这一支。
+function classicOverviewView() {
   const { trip } = state.pack;
   const companions = state.pack.companions || [];
   return `<section class="view overview-view">
@@ -841,6 +922,7 @@ function render() {
   renderShell();
   $("#app").innerHTML = views[state.tab] ? views[state.tab]() : overviewView();
   refreshIcons();
+  setupHomeReveal();
   if (state.tab === "itinerary") {
     mountMap();
     requestAnimationFrame(() => document.querySelector(".day-button.active")?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" }));
@@ -973,7 +1055,7 @@ document.addEventListener("click", async (event) => {
   const button = event.target.closest("button");
   if (!button || !state.pack) return;
   // 注意：dataset 解构名不得与模块级函数同名，否则会在处理器作用域内遮蔽函数（如 openAlternatives）。
-  const { tab, purpose, segment, day, currency, expensePanel, materialKind, openAttachments, attachmentMaterialId, openEditor, openSection, recordId, shiftItem, direction, exportIcs, deleteKind, defaultDay, mapMode, selectMapItem, openMapItem, calendarTask, itineraryView: itineraryViewMode, openAlternatives: alternativesForItem, copilotDay, copilotQuick, swapAlternative } = button.dataset;
+  const { tab, purpose, segment, day, currency, expensePanel, materialKind, openAttachments, attachmentMaterialId, openEditor, openSection, recordId, shiftItem, direction, exportIcs, deleteKind, defaultDay, mapMode, selectMapItem, openMapItem, calendarTask, itineraryView: itineraryViewMode, openAlternatives: alternativesForItem, copilotDay, copilotQuick, swapAlternative, homeAction, homeDay } = button.dataset;
   if (openEditor) {
     if (!await ensureEditReady()) return;
     const section = { trip: "trip", itinerary: "itinerary", place: "places", stay: "places", transport: "transport", task: "tasks", expense: "expenses", material: "materials" }[openEditor];
@@ -1018,6 +1100,20 @@ document.addEventListener("click", async (event) => {
     state.tab = tab;
     render();
     requestAnimationFrame(() => $("#moduleTitle")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+  } else if (homeDay) {
+    // 首页「今天的旅程」换一天，只影响首页焦点日，不动行程模块里的选择。
+    state.homeDayId = homeDay;
+    render();
+  } else if (homeAction === "start-day") {
+    // 主 CTA 真的把人送到行程模块，并把焦点落在今天（或最近的一天）。
+    const focus = homeFocusDay(state.pack, localNow());
+    if (focus) state.dayId = focus.id;
+    state.tab = "itinerary";
+    state.itineraryView = "list";
+    render();
+    requestAnimationFrame(() => $("#moduleTitle")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+  } else if (homeAction === "ask-ai") {
+    openCopilot({ source: { dayId: homeFocusDay(state.pack, localNow())?.id || null, itineraryItemId: null } });
   } else if (purpose) {
     state.purpose = purpose;
     state.segmentId = null;
@@ -1159,7 +1255,7 @@ $("#themeButton").addEventListener("click", () => applyTheme(document.documentEl
 applyTheme(localStorage.getItem("travel-wallet-theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"));
 
 function applyStyle(style, persist = true) {
-  const next = styleLabels[style] ? style : "aviation";
+  const next = styleLabels[style] ? style : DEFAULT_STYLE;
   document.documentElement.dataset.style = next;
   $("#styleButton span").textContent = styleLabels[next];
   $("#styleButton").setAttribute("aria-label", `选择界面风格，当前${styleLabels[next]}`);
@@ -1169,6 +1265,12 @@ function applyStyle(style, persist = true) {
   if (persist) localStorage.setItem("travel-wallet-style", next);
   document.querySelector('meta[name="theme-color"]').content = getComputedStyle(document.documentElement).getPropertyValue("--navy").trim() || "#1450d2";
   refreshIcons();
+  // 切到晴日手账时按需取回首页生产资产，再重绘一次。
+  if (next === STORYBOOK_STYLE_ID && !state.homeAssets) {
+    ensureHomeAssets().then(() => {
+      if (state.pack && isStorybookHome()) render();
+    });
+  }
 }
 
 $("#styleButton").addEventListener("click", () => $("#styleDialog").showModal());
@@ -1178,7 +1280,7 @@ $("#styleDialog").addEventListener("click", (event) => {
 });
 $("#styleDialogClose").addEventListener("click", () => $("#styleDialog").close());
 $("#styleDialogDone").addEventListener("click", () => $("#styleDialog").close());
-applyStyle(localStorage.getItem("travel-wallet-style") || "aviation", false);
+applyStyle(localStorage.getItem("travel-wallet-style") || DEFAULT_STYLE, false);
 
 function setSaveState(text, kind = "") {
   const element = $("#saveState");
@@ -1963,7 +2065,8 @@ async function load() {
       state.revision = pack.baseRevision ?? null;
       state.attachmentsEnabled = false;
       state.placeSearchEnabled = false;
-      applyStyle(localStorage.getItem("travel-wallet-style") || pack.appearance?.styleId || "aviation", false);
+      applyStyle(localStorage.getItem("travel-wallet-style") || pack.appearance?.styleId || DEFAULT_STYLE, false);
+      await ensureHomeAssets();
       render();
       document.body.dataset.appReady = "true";
     } catch (error) {
@@ -2009,7 +2112,8 @@ async function loadDocument(endpoint) {
     state.accessLinksEnabled = hostAdapter
       ? Boolean(payload.capabilities?.accessLinks)
       : state.mode === "edit";
-    applyStyle(localStorage.getItem("travel-wallet-style") || state.pack.appearance?.styleId || "aviation", false);
+    applyStyle(localStorage.getItem("travel-wallet-style") || state.pack.appearance?.styleId || DEFAULT_STYLE, false);
+    await ensureHomeAssets();
     render();
     document.body.dataset.appReady = "true";
     if (state.mode === "edit") toast("编辑链接已启用");

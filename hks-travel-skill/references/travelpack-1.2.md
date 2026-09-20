@@ -6,6 +6,7 @@ TravelPack 1.2.0 不是新协议，而是 [TravelPack 1.1](travelpack-1.1.md) �
 - `schemaVersion` 为 `"1.2.0"`。
 - 1.1 的全部顶层字段、字段名与语义**完全不变**：不删除、不重命名、不改语义。
 - 新能力只通过**新增字段**表达。
+- `appearance.styleId` 在 Phase 4A 以加法方式新增取值 `storybook`（晴日手账，首页视觉方向）；原六个取值语义不变，1.1 与 1.2 数据继续按原规则校验。取值全集见 `protocol.mjs` 的 `supportedStyleIds`。
 - 1.1 文档继续作为 legacy compatibility 契约存在；**字段细节以本文件为准，1.1 通用校验规则不在此重复抄写**。
 
 ```text

@@ -163,7 +163,7 @@ function isValidTravelPack(document) {
   if (!isPlainObject(document) || document.protocol !== "travelpack" || document.schemaVersion !== "1.1.0") return false;
   if (!isPlainObject(document.trip) || typeof document.trip.id !== "string" || typeof document.trip.title !== "string") return false;
   if (!COLLECTIONS.every((name) => Array.isArray(document[name]))) return false;
-  if (document.appearance && !["aviation", "natural", "minimal", "collage", "print", "urban"].includes(document.appearance.styleId)) return false;
+  if (document.appearance && !["storybook", "aviation", "natural", "minimal", "collage", "print", "urban"].includes(document.appearance.styleId)) return false;
   if (!document.tasks.every((task) => ["pending", "done"].includes(task.status)
     && (task.dueAt == null || (isPlainObject(task.dueAt) && typeof task.dueAt.localDate === "string")))) return false;
   if (!document.expenses.every((expense) => typeof expense.date === "string"

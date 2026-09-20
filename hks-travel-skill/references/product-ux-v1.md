@@ -187,6 +187,8 @@
 
 六套 `appearance.styleId` 的兼容能力保留，新信息架构必须在所有 style 与明暗模式下可工作。最终视觉留给 Phase 4。
 
+**Phase 4A 结论**：首页视觉方向落地为新增的 `storybook`（Sunny Travel Storybook）并成为新旅行的默认方向；原六套 style 的版式与 `aviation` 的票夹构图**原样保留**，因此本次视觉重构没有替换任何既有风格的页面结构。首页信息架构（Hero / 今天的旅程 / 为什么这样安排 / 已锁定安排 / 旅行状态 / 别错过）与资产目录见仓库根目录 `DESIGN.md`。
+
 ## 技术约束
 
 - 继续使用 vanilla HTML / CSS / JS + ES Modules，不迁移 React / Vue / Next.js / Vite。

@@ -42,6 +42,10 @@ export const addonObjectsV12 = ["preferences", "planningMeta", "tripStatus"];
 // validator 同时支持两个协议版本。
 export const supportedSchemaVersions = ["1.1.0", "1.2.0"];
 
+// UI 呈现方向。Phase 4A 以加法方式加入 `storybook`（Sunny Travel Storybook 首页），
+// 原有六个取值语义不变，旧数据不会因为这次扩展而失效。
+export const supportedStyleIds = ["storybook", "aviation", "natural", "minimal", "collage", "print", "urban"];
+
 // 这些键名属于凭据类字段，任何情况下都不允许出现在 TravelPack 1.2 新增结构里。
 const forbiddenCredentialKeys = [
   /^(?:api[_-]?key|apikey)$/i,
@@ -115,8 +119,8 @@ export function validateTravelPack(pack) {
     error("schemaVersion", `当前支持 ${supportedSchemaVersions.join("、")}`);
   }
   if (!pack.trip?.id || !pack.trip?.title) error("trip", "缺少旅行 ID 或标题");
-  if (pack.appearance != null && !["aviation", "natural", "minimal", "collage", "print", "urban"].includes(pack.appearance.styleId)) {
-    error("appearance.styleId", "必须是 aviation、natural、minimal、collage、print、urban 之一");
+  if (pack.appearance != null && !supportedStyleIds.includes(pack.appearance.styleId)) {
+    error("appearance.styleId", `必须是 ${supportedStyleIds.join("、")} 之一`);
   }
 
   for (const name of collections) {

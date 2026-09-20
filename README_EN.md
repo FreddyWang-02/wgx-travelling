@@ -2,7 +2,7 @@
 
 English · [中文](README.md)
 
-Hks-Travel-Skill is a travel-planning skill for Codex and compatible agents. It connects destination research, route approval, six visual previews, TravelPack generation, editable web deployment, and safe upgrades of existing sites.
+Hks-Travel-Skill is a travel-planning skill for Codex and compatible agents. It connects destination research, route approval, seven visual previews, TravelPack generation, editable web deployment, and safe upgrades of existing sites.
 
 Current version: `4.12.0`<br>
 Skill ID: `hks-travel-skill`
@@ -26,7 +26,7 @@ These screenshots come from a real deployment. They were reviewed for public rel
 ## Features
 
 - Researches destinations, transportation, areas to stay, reservation rules, and seasonal conditions with source and freshness metadata.
-- Presents six visual directions before production deployment: aviation, natural, minimal, collage, print, and urban.
+- Presents seven visual directions before production deployment: storybook, aviation, natural, minimal, collage, print, and urban.
 - Generates and validates TravelPack 1.1.0.
 - Delivers a five-module travel app covering transport, itinerary, preparation, expenses, and materials.
 - Supports pointer-based reordering, tasks, calendar export, shared expenses, attachments, and read-only sharing.

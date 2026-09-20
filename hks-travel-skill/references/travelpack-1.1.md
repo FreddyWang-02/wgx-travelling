@@ -22,7 +22,7 @@ sources[]
 
 ## 核心字段
 
-- `appearance`：`styleId` 必须是 `aviation`、`natural`、`minimal`、`collage`、`print`、`urban` 之一，并且来自用户在 UI 预览阶段的明确选择。`collage`、`print`、`urban` 在 V4 首轮只完成出行模块视觉审核，未经用户确认不得扩展为全模块正式风格。
+- `appearance`：`styleId` 必须是 `storybook`、`aviation`、`natural`、`minimal`、`collage`、`print`、`urban` 之一，并且来自用户在 UI 预览阶段的明确选择。`storybook`（晴日手账）由 Phase 4A 以加法方式加入，是首页的视觉方向；原六个取值语义不变，旧数据继续按原规则校验。`collage`、`print`、`urban` 在 V4 首轮只完成出行模块视觉审核，未经用户确认不得扩展为全模块正式风格。
 - `trip`：`id`、`title`、`startDate`、`endDate`、`defaultTimezone`、`destination`；可含 `subtitle`、`destinationCode`、`note`。
 - `days[]`：`id`、`date`、`title`。
 - `places[]`：`id`、`name`、`links[]`；坐标可选，存在时使用 `location.longitude`、`location.latitude`、`location.coordinateSystem = "WGS84"`。`links[]` 每项包含稳定 `id`、`title` 和 `http/https url`，用于保存小红书笔记、公众号、餐厅、购票和其他网页。
