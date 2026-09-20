@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="旅行小狗">
+  <title>Travel Puppy</title>
+  <!--
+    Sunny Travel Storybook · 主角色 Travel Puppy（旅行小狗）
+    分部件命名（CSS 动效契约，见 assets/home/homepage.css）：
+      .pup-breathe  呼吸（transform-origin 底部）
+      .pup-head     头部轻摆
+      .pup-eyes     眨眼
+      .pup-tail     摇尾
+      .pup-map      地图轻微起伏
+    只使用 transform / opacity 做动效，并遵守 prefers-reduced-motion。
+  -->
+  <g class="pup-root">
+    <ellipse class="pup-shadow" cx="100" cy="190" rx="54" ry="9" fill="#3a3229" opacity=".13"/>
+
+    <g class="pup-tail">
+      <path d="M146 152c24-4 36-26 26-48" fill="none" stroke="#e8bd83" stroke-width="19" stroke-linecap="round"/>
+      <path d="M172 104c3 9 0 17-6 21 1-10 3-17 6-21z" fill="#fbf1de" stroke="#463527" stroke-width="2.8" stroke-linejoin="round"/>
+    </g>
+
+    <g class="pup-pack">
+      <rect x="16" y="118" width="50" height="56" rx="15" fill="#c98a5b" stroke="#463527" stroke-width="3.4"/>
+      <path d="M28 136h26" stroke="#8a5a38" stroke-width="3.4" stroke-linecap="round"/>
+      <rect x="26" y="146" width="30" height="18" rx="5" fill="#b0714a" stroke="#463527" stroke-width="2.6"/>
+      <path d="M41 146v18" stroke="#463527" stroke-width="2.2"/>
+    </g>
+
+    <g class="pup-breathe">
+      <path d="M100 114c-26 0-45 21-45 46 0 19 19 28 45 28s45-9 45-28c0-25-19-46-45-46z" fill="#f7e5c8" stroke="#463527" stroke-width="3.4"/>
+      <ellipse cx="74" cy="180" rx="17" ry="10" fill="#efcfa3" stroke="#463527" stroke-width="3"/>
+      <ellipse cx="126" cy="180" rx="17" ry="10" fill="#efcfa3" stroke="#463527" stroke-width="3"/>
+      <path d="M74 124c2 16 4 30 6 42" fill="none" stroke="#8a5a38" stroke-width="4.4" stroke-linecap="round"/>
+      <path d="M126 124c-2 16-4 30-6 42" fill="none" stroke="#8a5a38" stroke-width="4.4" stroke-linecap="round"/>
+
+      <g class="pup-bandana">
+        <path d="M72 118h56l-26 34z" fill="#ef7548" stroke="#463527" stroke-width="3.2" stroke-linejoin="round"/>
+        <path d="M100 136l-9 18 9-5 9 5z" fill="#d95c30" stroke="#463527" stroke-width="2.6" stroke-linejoin="round"/>
+      </g>
+
+      <g class="pup-head">
+        <path d="M52 44C30 50 22 84 26 110c2 15 17 17 23 3 4-15 6-45 3-69z" fill="#e8bd83" stroke="#463527" stroke-width="3.2" stroke-linejoin="round"/>
+        <path d="M148 44c22 6 30 40 26 66-2 15-17 17-23 3-4-15-6-45-3-69z" fill="#e8bd83" stroke="#463527" stroke-width="3.2" stroke-linejoin="round"/>
+        <circle cx="100" cy="76" r="54" fill="#f7e5c8" stroke="#463527" stroke-width="3.4"/>
+        <path d="M56 46c10-16 26-24 44-24s34 8 44 24c-11 11-26 16-44 16s-33-5-44-16z" fill="#efcfa3" opacity=".8"/>
+        <ellipse cx="54" cy="96" rx="11" ry="7" fill="#f2a58c" opacity=".5"/>
+        <ellipse cx="146" cy="96" rx="11" ry="7" fill="#f2a58c" opacity=".5"/>
+        <ellipse cx="100" cy="108" rx="28" ry="21" fill="#fdf6e8"/>
+        <ellipse cx="100" cy="99" rx="7.6" ry="5.8" fill="#6b5140"/>
+        <path d="M88 112c4 9 20 9 24 0z" fill="#8b4a3a" stroke="#463527" stroke-width="2.2" stroke-linejoin="round"/>
+        <path d="M95.4 114c1.4 4 7.8 4 9.2 0z" fill="#f2907f"/>
+        <g class="pup-eyes">
+          <ellipse cx="78" cy="82" rx="8" ry="9.4" fill="#3b2c20"/>
+          <ellipse cx="122" cy="82" rx="8" ry="9.4" fill="#3b2c20"/>
+          <circle cx="80.8" cy="78" r="2.8" fill="#fffdf8"/>
+          <circle cx="124.8" cy="78" r="2.8" fill="#fffdf8"/>
+        </g>
+      </g>
+    </g>
+
+    <g class="pup-map">
+      <path d="M58 156l80-9 10 30-81 10z" fill="#fbf4e4" stroke="#463527" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M85 154l4 29M112 151l3 29" stroke="#e8d3b4" stroke-width="2" stroke-linecap="round"/>
+      <path d="M68 174c8-6 16 4 24-3s16 2 24-6" fill="none" stroke="#ef7548" stroke-width="2.4" stroke-dasharray="4 4" stroke-linecap="round"/>
+      <path d="M120 163c-3.6 0-6.4 2.6-6.4 6 0 4.2 6.4 10 6.4 10s6.4-5.8 6.4-10c0-3.4-2.8-6-6.4-6z" fill="#ef7548" stroke="#463527" stroke-width="2.2"/>
+    </g>
+    <ellipse cx="84" cy="180" rx="13" ry="9" fill="#fdf6e8" stroke="#463527" stroke-width="2.8"/>
+    <ellipse cx="118" cy="178" rx="13" ry="9" fill="#fdf6e8" stroke="#463527" stroke-width="2.8"/>
+  </g>
+</svg>

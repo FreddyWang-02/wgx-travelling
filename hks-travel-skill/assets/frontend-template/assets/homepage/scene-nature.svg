@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" width="800" height="520" role="img" aria-label="自然田园风景插画" preserveAspectRatio="xMidYMid slice">
+  <title>Nature scene</title>
+  <defs>
+    <linearGradient id="nat-sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="var(--scene-sky-1, #dceaf4)"/>
+      <stop offset=".58" stop-color="var(--scene-sky-2, #fdf0d6)"/>
+      <stop offset="1" stop-color="var(--scene-sky-3, #ffe5c0)"/>
+    </linearGradient>
+    <radialGradient id="nat-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#ffe9a8" stop-opacity=".95"/>
+      <stop offset="1" stop-color="#ffe9a8" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="800" height="520" fill="url(#nat-sky)"/>
+  <circle cx="238" cy="156" r="132" fill="url(#nat-glow)"/>
+  <g stroke="var(--scene-sun, #ffd377)" stroke-width="5" stroke-linecap="round" opacity=".7">
+    <path d="M238 44v-26M238 268v26M350 156h26M126 156h-26M317 77l18-18M159 235l-18 18M317 235l18 18M159 77l-18-18"/>
+  </g>
+  <circle cx="238" cy="156" r="50" fill="var(--scene-sun, #ffd377)"/>
+
+  <g fill="#fffdf8" opacity=".85">
+    <ellipse cx="566" cy="106" rx="72" ry="21"/>
+    <ellipse cx="624" cy="98" rx="46" ry="16"/>
+    <ellipse cx="470" cy="176" rx="44" ry="14"/>
+  </g>
+  <g stroke="#6f5a45" stroke-width="2.6" stroke-linecap="round" fill="none" opacity=".5">
+    <path d="M400 128c7-8 14-8 21 0"/>
+    <path d="M432 116c6-7 12-7 18 0"/>
+    <path d="M370 106c5-6 10-6 15 0"/>
+  </g>
+
+  <path d="M0 336C120 292 240 306 356 344c114 38 232 36 344 0 50-16 80-22 100-24v200H0z" fill="#bcd2b4"/>
+  <path d="M0 400c110-34 220-28 330 4s230 30 350 0c50-12 90-14 120-12v128H0z" fill="#93b389"/>
+
+  <g>
+    <path d="M148 372v52" stroke="#7a5b41" stroke-width="7" stroke-linecap="round"/>
+    <circle cx="148" cy="348" r="34" fill="#7fa971"/>
+    <circle cx="124" cy="364" r="24" fill="#8cb87c"/>
+    <circle cx="172" cy="364" r="22" fill="#8cb87c"/>
+    <path d="M258 388v44" stroke="#7a5b41" stroke-width="6" stroke-linecap="round"/>
+    <circle cx="258" cy="366" r="28" fill="#7fa971"/>
+    <circle cx="238" cy="378" r="19" fill="#8cb87c"/>
+    <circle cx="278" cy="378" r="17" fill="#8cb87c"/>
+    <path d="M560 380v50" stroke="#7a5b41" stroke-width="7" stroke-linecap="round"/>
+    <circle cx="560" cy="352" r="32" fill="var(--scene-accent, #ef9a5c)"/>
+    <circle cx="536" cy="368" r="22" fill="#f0ab72"/>
+    <circle cx="584" cy="368" r="20" fill="#f0ab72"/>
+    <path d="M676 396v42" stroke="#7a5b41" stroke-width="6" stroke-linecap="round"/>
+    <circle cx="676" cy="374" r="26" fill="var(--scene-accent, #ef9a5c)"/>
+    <circle cx="658" cy="384" r="17" fill="#f0ab72"/>
+  </g>
+
+  <path d="M0 456c140-26 300-20 440 4 120 20 260 16 360-2v62H0z" fill="var(--scene-near, #d9a86a)"/>
+  <path d="M0 462c140-26 300-20 440 4 120 20 260 16 360-2" fill="none" stroke="#c79457" stroke-width="3" opacity=".6"/>
+  <g stroke="#7d9a63" stroke-width="3" stroke-linecap="round" fill="none">
+    <path d="M64 512c0-16 4-26 10-32M112 516c0-14 3-22 8-28M164 512c0-16 4-26 10-32"/>
+    <path d="M330 516c0-14 3-24 9-30M392 512c0-16 4-26 10-32M452 516c0-14 3-22 8-28"/>
+    <path d="M610 512c0-16 4-26 10-32M672 516c0-14 3-22 8-28M726 512c0-16 4-26 10-32"/>
+  </g>
+  <g fill="#fffdf8">
+    <circle cx="74" cy="470" r="7"/><circle cx="120" cy="480" r="6"/><circle cx="174" cy="472" r="7"/>
+    <circle cx="340" cy="478" r="6.4"/><circle cx="400" cy="470" r="7"/><circle cx="460" cy="480" r="6"/>
+    <circle cx="620" cy="472" r="7"/><circle cx="680" cy="480" r="6"/><circle cx="734" cy="470" r="6.4"/>
+  </g>
+  <g fill="var(--scene-accent, #ef9a5c)">
+    <circle cx="96" cy="490" r="5"/><circle cx="196" cy="492" r="5"/><circle cx="366" cy="492" r="5"/>
+    <circle cx="486" cy="492" r="5"/><circle cx="644" cy="490" r="5"/><circle cx="752" cy="492" r="5"/>
+  </g>
+</svg>

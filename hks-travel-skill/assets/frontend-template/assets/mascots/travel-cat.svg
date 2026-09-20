@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 160" width="200" height="160" role="img" aria-label="旅行小猫">
+  <title>Travel Cat</title>
+  <!--
+    Sunny Travel Storybook · 次角色 Travel Cat（旅行小猫）
+    分部件命名（CSS 动效契约，见 assets/home/homepage.css）：
+      .cat-breathe  呼吸（幅度比小狗更小、更慢）
+      .cat-head     极轻的头/耳动作
+      .cat-eyes     眨眼（与小狗错开）
+      .cat-tail     尾巴慢摆
+      .cat-camera   挂在胸前的相机
+  -->
+  <g class="cat-root">
+    <ellipse class="cat-shadow" cx="104" cy="148" rx="66" ry="8" fill="#3a3229" opacity=".12"/>
+
+    <g class="cat-tail">
+      <path d="M160 128c26-5 36-27 24-48" fill="none" stroke="#d3cec7" stroke-width="17" stroke-linecap="round"/>
+      <path d="M184 80c3 9 0 17-6 21 1-10 3-17 6-21z" fill="#b3aca2" stroke="#463527" stroke-width="2.6" stroke-linejoin="round"/>
+    </g>
+
+    <g class="cat-breathe">
+      <ellipse cx="108" cy="118" rx="58" ry="32" fill="#d3cec7" stroke="#463527" stroke-width="3.4"/>
+      <path d="M150 100c8 3 13 8 16 14" fill="none" stroke="#b3aca2" stroke-width="5" stroke-linecap="round"/>
+      <path d="M156 114c7 3 11 7 13 12" fill="none" stroke="#b3aca2" stroke-width="5" stroke-linecap="round"/>
+
+      <g class="cat-head">
+        <path d="M54 42L44 6l42 24z" fill="#d3cec7" stroke="#463527" stroke-width="3.2" stroke-linejoin="round"/>
+        <path d="M104 42l10-36-42 24z" fill="#d3cec7" stroke="#463527" stroke-width="3.2" stroke-linejoin="round"/>
+        <path d="M56 38l-6-21 23 14z" fill="#f0b7ac"/>
+        <path d="M103 38l6-21-23 14z" fill="#f0b7ac"/>
+        <circle cx="79" cy="68" r="44" fill="#d3cec7" stroke="#463527" stroke-width="3.4"/>
+        <path d="M66 30v12M79 27v13M92 30v12" stroke="#b3aca2" stroke-width="4.2" stroke-linecap="round"/>
+        <ellipse cx="68" cy="86" rx="12" ry="9.2" fill="#fbf3e7"/>
+        <ellipse cx="90" cy="86" rx="12" ry="9.2" fill="#fbf3e7"/>
+        <path d="M79 76l-6.4 6.4h12.8z" fill="#e08a7d" stroke="#463527" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M79 82.4v4.6" stroke="#463527" stroke-width="2.2" stroke-linecap="round"/>
+        <path d="M79 87c-3.8 0-5.6 3.2-9.2 3.2M79 87c3.8 0 5.6 3.2 9.2 3.2" fill="none" stroke="#463527" stroke-width="2.2" stroke-linecap="round"/>
+        <g class="cat-eyes">
+          <ellipse cx="64" cy="66" rx="6.6" ry="7.8" fill="#3b2c20"/>
+          <ellipse cx="94" cy="66" rx="6.6" ry="7.8" fill="#3b2c20"/>
+          <circle cx="66.2" cy="63" r="2.3" fill="#fffdf8"/>
+          <circle cx="96.2" cy="63" r="2.3" fill="#fffdf8"/>
+        </g>
+        <ellipse cx="44" cy="84" rx="9" ry="5.6" fill="#f2a58c" opacity=".45"/>
+        <ellipse cx="114" cy="84" rx="9" ry="5.6" fill="#f2a58c" opacity=".45"/>
+        <path d="M36 82H16M37 90H17M122 82h20M121 90h20" stroke="#b3aca2" stroke-width="2.2" stroke-linecap="round"/>
+      </g>
+    </g>
+
+    <ellipse cx="82" cy="140" rx="15" ry="9" fill="#fbf3e7" stroke="#463527" stroke-width="2.8"/>
+    <ellipse cx="126" cy="140" rx="15" ry="9" fill="#fbf3e7" stroke="#463527" stroke-width="2.8"/>
+
+    <g class="cat-camera">
+      <path d="M96 96c16 3 26 10 30 20" fill="none" stroke="#c98a5b" stroke-width="4.4" stroke-linecap="round"/>
+      <rect x="104" y="112" width="38" height="26" rx="7" fill="#f2cd6b" stroke="#463527" stroke-width="3"/>
+      <rect x="129" y="104" width="12" height="10" rx="2.6" fill="#f2cd6b" stroke="#463527" stroke-width="2.4"/>
+      <circle cx="123" cy="125" r="7.8" fill="#6b5140" stroke="#463527" stroke-width="2.4"/>
+      <circle cx="123" cy="125" r="2.8" fill="#fbf3e7"/>
+      <circle cx="135" cy="119" r="2.2" fill="#463527"/>
+    </g>
+  </g>
+</svg>

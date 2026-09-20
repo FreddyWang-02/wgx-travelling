@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" width="800" height="520" role="img" aria-label="海岛海岸风景插画" preserveAspectRatio="xMidYMid slice">
+  <title>Coast scene</title>
+  <defs>
+    <linearGradient id="cst-sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="var(--scene-sky-1, #cbeeff)"/>
+      <stop offset=".52" stop-color="var(--scene-sky-2, #ffe7c6)"/>
+      <stop offset="1" stop-color="var(--scene-sky-3, #ffc98f)"/>
+    </linearGradient>
+    <linearGradient id="cst-sea" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="var(--scene-sea-1, #a5e2e6)"/>
+      <stop offset="1" stop-color="var(--scene-sea-2, #3fa0b8)"/>
+    </linearGradient>
+    <radialGradient id="cst-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#ffe9a8" stop-opacity=".9"/>
+      <stop offset="1" stop-color="#ffe9a8" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="800" height="520" fill="url(#cst-sky)"/>
+  <circle cx="604" cy="158" r="132" fill="url(#cst-glow)"/>
+  <circle cx="604" cy="158" r="48" fill="var(--scene-sun, #ffd377)"/>
+
+  <g fill="#fffdf8" opacity=".84">
+    <ellipse cx="168" cy="102" rx="68" ry="21"/>
+    <ellipse cx="222" cy="94" rx="44" ry="17"/>
+    <ellipse cx="652" cy="82" rx="52" ry="16"/>
+  </g>
+  <g stroke="#6f5a45" stroke-width="2.6" stroke-linecap="round" fill="none" opacity=".5">
+    <path d="M250 168c7-8 14-8 21 0"/>
+    <path d="M282 154c6-7 12-7 18 0"/>
+    <path d="M220 146c5-6 10-6 15 0"/>
+  </g>
+
+  <path d="M48 300c24-5 44-20 70-20s46 15 70 20z" fill="#86b6b0" opacity=".55"/>
+  <path d="M236 300c16-3 30-13 47-13s31 10 47 13z" fill="#86b6b0" opacity=".4"/>
+
+  <rect y="300" width="800" height="220" fill="url(#cst-sea)"/>
+  <g stroke="#fffdf8" stroke-width="3.4" stroke-linecap="round" fill="none" opacity=".62">
+    <path d="M36 344c22-9 44 9 66 0s44 9 66 0"/>
+    <path d="M300 390c26-10 52 10 78 0s52 10 78 0"/>
+    <path d="M96 444c20-8 40 8 60 0"/>
+    <path d="M560 420c24-9 48 9 72 0"/>
+  </g>
+  <path d="M228 348l17-27 4 27 15-21 6 23z" fill="#fffdf8"/>
+  <path d="M228 348h48l-6 11h-36z" fill="#e8d3b4"/>
+
+  <!-- 右侧礁石海岬：山体 + 顶部草帽用同一条曲线保证贴合 -->
+  <path d="M470 520c0-70 18-118 56-144 34-24 80-36 134-36 34 0 66 5 96 15l44 15v150z" fill="var(--scene-near, #c8a978)"/>
+  <path d="M470 520c0-70 18-118 56-144 34-24 80-36 134-36 34 0 66 5 96 15l44 15" fill="none" stroke="var(--scene-far, #8fae72)" stroke-width="27" stroke-linecap="round"/>
+  <path d="M536 420c22-32 56-52 100-58" fill="none" stroke="#a98a5f" stroke-width="4" stroke-linecap="round" opacity=".55"/>
+  <path d="M578 470c26-42 64-70 116-84" fill="none" stroke="#a98a5f" stroke-width="4" stroke-linecap="round" opacity=".45"/>
+  <ellipse cx="606" cy="332" rx="34" ry="19" fill="var(--scene-far, #8fae72)"/>
+  <ellipse cx="692" cy="352" rx="30" ry="16" fill="var(--scene-far, #8fae72)"/>
+  <g stroke="#5f7a4c" stroke-width="3" stroke-linecap="round">
+    <path d="M596 322v-16M612 320v-20M628 322v-15M686 344v-15M702 340v-19M716 344v-14"/>
+  </g>
+  <g fill="var(--scene-accent, #f2a58c)">
+    <circle cx="640" cy="360" r="5"/>
+    <circle cx="660" cy="376" r="4.2"/>
+    <circle cx="744" cy="392" r="4.8"/>
+  </g>
+
+  <!-- 左下沙滩 -->
+  <path d="M0 520v-56c72-11 146-15 218-12 58 3 108 9 154 19l24 7v42z" fill="var(--scene-sand, #eed7ab)"/>
+  <path d="M0 464c72-11 146-15 218-12 58 3 108 9 154 19" fill="none" stroke="#dcc298" stroke-width="3"/>
+  <g stroke="#d3b98f" stroke-width="3" stroke-linecap="round" opacity=".8">
+    <path d="M96 486c34-5 68-12 100-22"/>
+    <path d="M74 506c38-6 74-16 108-30"/>
+  </g>
+  <g fill="#fffdf8">
+    <circle cx="150" cy="496" r="7"/>
+    <circle cx="172" cy="486" r="5.4"/>
+    <circle cx="192" cy="500" r="6.2"/>
+  </g>
+  <path d="M292 486l16-9 3 9-10 3z" fill="#f2a58c" opacity=".85"/>
+  <g stroke="#6f9c62" stroke-width="3.4" stroke-linecap="round" fill="none">
+    <path d="M340 500c0-14 4-22 10-28"/>
+    <path d="M378 508c0-12 3-19 9-24"/>
+  </g>
+</svg>

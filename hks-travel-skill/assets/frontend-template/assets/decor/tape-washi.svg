@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 44" preserveAspectRatio="none" role="img" aria-label="纸胶带">
+  <title>Washi tape</title>
+  <path d="M0 5c8 3 16-3 24 0s16 3 24 0 16-3 24 0 16 3 24 0 16-3 24 0 16 3 24 0 12-2 16-1v34c-4 1-8-2-16-1s-16 3-24 0-16-3-24 0-16 3-24 0-16-3-24 0-16 3-24 0-8-2-16-1z"
+        fill="var(--sb-butter, #f2cd6b)" fill-opacity=".66"/>
+  <path d="M0 6.5c8 3 16-3 24 0s16 3 24 0 16-3 24 0 16 3 24 0 16-3 24 0 16 3 24 0 12-2 16-1" fill="none" stroke="#fffdf8" stroke-width="2.4" stroke-opacity=".6"/>
+  <path d="M0 37.5c4 1 8-2 16-1s16 3 24 0 16-3 24 0 16 3 24 0 16-3 24 0 16 3 24 0 12-2 16-1" fill="none" stroke="#e0b87e" stroke-width="2" stroke-opacity=".45"/>
+</svg>

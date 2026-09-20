@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" width="800" height="520" role="img" aria-label="古城人文风景插画" preserveAspectRatio="xMidYMid slice">
+  <title>Heritage scene</title>
+  <defs>
+    <linearGradient id="her-sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="var(--scene-sky-1, #f3dfd2)"/>
+      <stop offset=".55" stop-color="var(--scene-sky-2, #ffdcb4)"/>
+      <stop offset="1" stop-color="var(--scene-sky-3, #ffc79a)"/>
+    </linearGradient>
+    <radialGradient id="her-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#ffe0a0" stop-opacity=".9"/>
+      <stop offset="1" stop-color="#ffe0a0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="800" height="520" fill="url(#her-sky)"/>
+  <circle cx="376" cy="230" r="152" fill="url(#her-glow)"/>
+  <circle cx="376" cy="230" r="54" fill="var(--scene-sun, #ffbe72)"/>
+
+  <g fill="#fffdf8" opacity=".7">
+    <ellipse cx="170" cy="104" rx="66" ry="19"/>
+    <ellipse cx="222" cy="98" rx="42" ry="15"/>
+    <ellipse cx="620" cy="126" rx="52" ry="15"/>
+  </g>
+  <g stroke="#6f5a45" stroke-width="2.6" stroke-linecap="round" fill="none" opacity=".5">
+    <path d="M470 108c7-8 14-8 21 0"/>
+    <path d="M502 96c6-7 12-7 18 0"/>
+    <path d="M440 88c5-6 10-6 15 0"/>
+  </g>
+
+  <path d="M0 336c96-32 190-24 276 12s176 44 268 20c88-24 168-32 256-16v168H0z" fill="#dcb894" opacity=".75"/>
+
+  <g>
+    <path d="M552 404h120v60H552z" fill="#e3c9a5"/>
+    <path d="M566 372h92v32h-92z" fill="#e8d0ad"/>
+    <path d="M534 374c34-10 122-10 156 0l-16-26H550z" fill="#a3553f"/>
+    <path d="M578 320h68v30h-68z" fill="#e8d0ad"/>
+    <path d="M548 322c30-9 110-9 140 0l-14-26H562z" fill="#a3553f"/>
+    <path d="M590 274h44v28h-44z" fill="#e8d0ad"/>
+    <path d="M562 276c24-8 78-8 102 0l-12-24H574z" fill="#a3553f"/>
+    <path d="M612 252v-32" stroke="#8c4a3a" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="612" cy="214" r="7" fill="var(--scene-accent, #ef7548)"/>
+    <g fill="#8c5b45">
+      <rect x="596" y="284" width="10" height="12" rx="2"/><rect x="618" y="284" width="10" height="12" rx="2"/>
+      <rect x="586" y="330" width="11" height="14" rx="2"/><rect x="608" y="330" width="11" height="14" rx="2"/><rect x="628" y="330" width="11" height="14" rx="2"/>
+      <rect x="586" y="382" width="14" height="22" rx="2"/><rect x="612" y="382" width="14" height="22" rx="2"/>
+    </g>
+  </g>
+
+  <g>
+    <path d="M180 452c18-9 152-9 170 0l-14-24H194z" fill="#8c5b45"/>
+    <path d="M186 452h158v48H186z" fill="#e8d0ad"/>
+    <path d="M60 430c18-9 132-9 150 0l-14-24H74z" fill="#a3553f"/>
+    <path d="M66 430h138v70H66z" fill="#e8d0ad"/>
+    <path d="M300 424c18-9 142-9 160 0l-13-24H313z" fill="#a3553f"/>
+    <path d="M306 424h148v62H306z" fill="#e8d0ad"/>
+  </g>
+  <g fill="#8c5b45">
+    <rect x="92" y="446" width="20" height="36" rx="3"/><rect x="134" y="446" width="20" height="36" rx="3"/>
+    <rect x="212" y="466" width="24" height="34" rx="3"/><rect x="276" y="466" width="24" height="34" rx="3"/>
+    <rect x="340" y="440" width="22" height="38" rx="3"/><rect x="392" y="440" width="22" height="38" rx="3"/>
+  </g>
+
+  <g>
+    <path d="M470 322v34M508 352v30" stroke="#8c4a3a" stroke-width="3"/>
+    <ellipse cx="470" cy="318" rx="16" ry="19" fill="var(--scene-accent, #ef7548)" opacity=".92"/>
+    <ellipse cx="508" cy="348" rx="14" ry="17" fill="var(--scene-accent, #ef7548)" opacity=".92"/>
+    <path d="M470 337v10M508 365v9" stroke="var(--scene-accent, #ef7548)" stroke-width="3.4" stroke-linecap="round"/>
+  </g>
+
+  <path d="M126 500c6-52 0-92-14-120" fill="none" stroke="#7a5b41" stroke-width="11" stroke-linecap="round"/>
+  <path d="M120 424c-14-10-24-24-26-40M124 404c14-8 26-20 30-34" fill="none" stroke="#7a5b41" stroke-width="8" stroke-linecap="round"/>
+  <g fill="var(--scene-blossom, #f6bfd0)">
+    <ellipse cx="76" cy="356" rx="56" ry="42" opacity=".95"/>
+    <ellipse cx="140" cy="332" rx="52" ry="40" opacity=".95"/>
+    <ellipse cx="110" cy="386" rx="46" ry="34" opacity=".95"/>
+    <ellipse cx="176" cy="382" rx="44" ry="32" opacity=".9"/>
+    <ellipse cx="56" cy="404" rx="38" ry="28" opacity=".85"/>
+  </g>
+  <g fill="#fff2f6" opacity=".8">
+    <circle cx="92" cy="344" r="5"/><circle cx="150" cy="326" r="4.4"/><circle cx="118" cy="380" r="4.6"/>
+    <circle cx="184" cy="376" r="4"/><circle cx="66" cy="396" r="4.2"/>
+  </g>
+
+  <path d="M0 520v-40c150-14 320 8 470-2s220-14 330-6v48z" fill="var(--scene-near, #c8a978)"/>
+  <g stroke="#a98a5f" stroke-width="3" opacity=".7">
+    <path d="M0 490c150-14 320 8 470-2s220-14 330-6"/>
+    <path d="M100 520v-22M300 520v-24M520 520v-22M700 520v-20"/>
+  </g>
+</svg>
