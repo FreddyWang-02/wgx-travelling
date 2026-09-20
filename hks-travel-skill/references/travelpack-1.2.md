@@ -101,9 +101,18 @@ tripStatus           ← 1.2 新增
 | `generatedAt` | `YYYY-MM-DD` \| `YYYY-MM-DDTHH:MM` | 旅行数据生成时间 |
 | `lastPlannedAt` | 同上 \| `null` | 最近一次规划或重规划时间 |
 | `overallConfidence` | `number` ∈ `[0, 1]` \| `null` | 整体置信度，未知为 `null` |
-| `needsRecheckCount` | 非负整数 | 待复核条目数量 |
+| `needsRecheckCount` | 非负整数 | **规划快照值**：最近一次规划时的待复核数量（见下） |
 
 禁止在 `planningMeta` 中保存 chain-of-thought、隐藏推理、内部 token 日志或模型 scratchpad；只保存用户可理解、产品需要的元信息。
+
+### needsRecheckCount 语义（快照值，不是实时派生值）
+
+`needsRecheckCount` 是**最近一次 full-plan / local-replan 时生成的"规划快照值"**，不是实时派生值。
+
+- 它表示 `generatedAt` / `lastPlannedAt` 对应时刻的待复核数量。
+- 运行期间如果 `sources`、`alternatives`、`tasks` 等数据状态发生变化（例如某条来源由 `needs-recheck` 变为 `current`，或新增了一条待复核备选），该字段**不会自动同步**。
+- 前端或 Agent 若需要"当前实时数量"，必须**重新计算**（例如实时统计 `sources[].freshness.status = "needs-recheck"`、`tasks[].status = "pending"` 且 `kind = "recheck"`、`alternatives[].status = "needs-recheck"` 的条目），**不能假设 `needsRecheckCount` 永远实时同步**。
+- 因此 validator 只保证它是非负整数，**不保证它与当前数据一致**。字段名、类型与 validator 行为均不因此改变。
 
 ## alternatives[]（候选替代方案）
 
