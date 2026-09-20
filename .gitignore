@@ -35,3 +35,6 @@ tmp/
 # Release archives are built locally
 release/
 *.zip
+
+# WorkBuddy local process memory (not part of the published product)
+.workbuddy/
