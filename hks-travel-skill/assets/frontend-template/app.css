@@ -861,3 +861,130 @@ dialog[open] { margin: auto; }
   .heading-actions .compact-label { display: inline; }
   .heading-actions .text-button { padding-inline: 9px; }
 }
+
+/* ── Phase 3 · 产品信息架构：概览 / 行程列表与地图 / AI Copilot ──
+   只新增结构所需样式；六套 style 与深色变量继续共用。 */
+
+/* 为固定的 AI Copilot 入口留出滚动余量，底部内容（含地图详情卡）可以滚出悬浮按钮。 */
+main { padding-bottom: 128px; }
+
+/* 概览 */
+.overview-hero { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; flex-wrap: wrap; margin-bottom: 18px; padding: 20px 22px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); }
+.overview-hero h3 { margin: 0 0 6px; font-size: 22px; }
+.overview-hero p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.65; }
+.overview-hero-meta { display: flex; gap: 20px; }
+.overview-hero-meta span { color: var(--muted); font-size: 11px; }
+.overview-hero-meta b { display: block; margin-bottom: 2px; color: var(--ink); font-size: 19px; }
+.overview-status { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 20px; }
+.status-cell { min-width: 138px; padding: 11px 15px; border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--paper); }
+.status-cell small { display: block; margin-bottom: 4px; color: var(--muted); font-size: 10px; }
+.status-cell strong { font-size: 15px; }
+.overview-status .plain-note { flex: 1 1 260px; margin: 0; }
+.overview-grid { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 18px; }
+.overview-main, .overview-side { display: grid; gap: 16px; align-content: start; }
+.overview-next-main { display: flex; align-items: baseline; flex-wrap: wrap; gap: 12px; margin: 6px 0 8px; }
+.overview-next-main b { font-size: 18px; }
+.overview-next-main span { color: var(--muted); font-size: 12px; }
+.overview-next-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.overview-section-title h3 { display: flex; align-items: center; gap: 7px; font-size: 15px; }
+.overview-travel { margin-top: 30px; }
+.overview-travel .tabs { margin-top: 14px; }
+
+/* 已锁定安排 / 偏好 / AI 最近调整 */
+.locked-section > p { margin: 0 0 6px; color: var(--muted); font-size: 12px; }
+.locked-row { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; align-items: start; gap: 10px; padding: 11px 0; border-bottom: 1px solid var(--line); }
+.locked-row:last-child { border-bottom: 0; }
+.locked-mark { font-size: 13px; line-height: 1.5; }
+.locked-row h4 { margin: 0 0 4px; font-size: 14px; }
+.locked-row p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
+.preference-chips { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 10px; }
+.preference-chip { padding: 6px 11px; border: 1px solid var(--line); border-radius: 999px; background: var(--blue-soft); color: var(--ink); font-size: 12px; }
+.preference-notes { margin: 0 0 12px; padding-left: 18px; color: var(--muted); font-size: 12px; line-height: 1.7; }
+.replan-row { padding: 11px 0; border-bottom: 1px solid var(--line); }
+.replan-row:last-child { border-bottom: 0; }
+.replan-row h4 { display: flex; align-items: center; gap: 8px; margin: 0 0 5px; font-size: 14px; }
+.replan-status { padding: 2px 8px; border-radius: 999px; background: var(--surface-2); color: var(--muted); font-size: 10px; font-weight: 700; }
+.replan-row p { margin: 0 0 4px; color: var(--muted); font-size: 12px; line-height: 1.6; }
+.replan-row small { color: var(--muted); font-size: 11px; }
+
+/* 行程：视图切换、锁定标记、AI 理由、换一个 */
+.view-switcher { display: inline-flex; margin: 0 0 16px; padding: 3px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); }
+.view-switch { min-height: 34px; padding: 6px 20px; border: 0; border-radius: 999px; background: transparent; color: var(--muted); cursor: pointer; font-size: 12px; font-weight: 700; }
+.view-switch.active { background: var(--paper); color: var(--blue); box-shadow: 0 1px 2px rgba(18, 42, 74, .1); }
+.day-context { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+.ai-day-button { flex: 0 0 auto; }
+.day-reasons { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 8px; margin: 0 0 18px; padding: 12px 14px; border: 1px dashed var(--line); border-radius: var(--radius-control); background: var(--surface); }
+.day-reasons p, .stop-reason p { margin: 3px 0 0; font-size: 12px; line-height: 1.6; }
+.day-reasons small, .stop-reason small { color: var(--muted); font-size: 10px; letter-spacing: .04em; }
+.reason-mark { font-size: 14px; line-height: 1.3; }
+.reason-tag { margin-right: 6px; padding: 2px 7px; border-radius: 999px; background: var(--surface-2); color: var(--muted); font-size: 10px; }
+.lock-mark { flex: 0 0 auto; font-size: 12px; line-height: 1; }
+/* 点击卡片本体即选中该节点，地图同步高亮。 */
+.route-stop > .stop-card { cursor: pointer; }
+.stop-extras { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px; padding: 0 12px 12px; }
+.stop-lock { flex: 1 1 100%; margin: 0; color: var(--muted); font-size: 11px; }
+.stop-reason { flex: 1 1 250px; display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 6px; padding: 10px 12px; border: 1px dashed var(--line); border-radius: var(--radius-control); background: var(--surface); }
+.stop-swap { flex: 0 0 auto; margin-left: auto; }
+.swap-count { padding: 0 6px; border-radius: 999px; background: var(--surface-2); font-size: 10px; }
+/* 地图是「行程」内部视图：地图视图只显示地图，行程视图在窄屏只显示清单。 */
+[data-view="map"] .itinerary-col-list { display: none; }
+[data-view="map"] .itinerary-grid { grid-template-columns: minmax(0, 1fr); }
+[data-view="map"] .map-panel { position: static; }
+
+/* 准备：出发前时间阶段 */
+.prepare-phases { display: grid; gap: 16px; }
+.phase-section { margin-top: 0; padding: 20px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); }
+
+/* 资料：来源时效 */
+.freshness-badge.ok { background: #e8f5ec; color: #277240; }
+.freshness-badge.warn { background: #fff0dc; color: #9b5c08; }
+.freshness-badge.danger { background: #fdecec; color: #a5342f; }
+
+/* AI Copilot：全局 FAB + Bottom Sheet */
+.copilot-fab { position: fixed; right: 24px; bottom: 24px; z-index: 30; display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 12px 18px; border: 1px solid var(--blue); border-radius: 999px; background: var(--blue); color: #fff; cursor: pointer; font-size: 13px; font-weight: 700; box-shadow: var(--shadow); }
+.copilot-fab-mark { font-size: 15px; }
+.sheet-dialog { width: min(560px, calc(100vw - 30px)); max-height: min(88dvh, 720px); }
+.sheet-dialog[open] { margin: auto auto 0; }
+.copilot-body { max-height: 58dvh; padding: 0 24px 4px; overflow-y: auto; }
+.copilot-quick { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 14px; }
+.quick-action { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--paper); color: var(--ink); cursor: pointer; text-align: left; font-size: 12px; }
+.quick-action:hover { border-color: var(--blue); }
+.quick-action.active { border-color: var(--blue); background: var(--blue-soft); }
+.quick-mark { font-size: 15px; }
+.copilot-input { display: grid; gap: 6px; margin-bottom: 14px; }
+.copilot-input span { color: var(--muted); font-size: 11px; }
+.copilot-input textarea, .copilot-request textarea { width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--surface); color: var(--ink); font: 13px/1.6 var(--font); resize: vertical; }
+.copilot-request { margin-bottom: 12px; padding: 14px; border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--paper); }
+.copilot-request textarea { min-height: 170px; margin-bottom: 10px; font: 12px/1.65 ui-monospace, SFMono-Regular, Menlo, monospace; }
+.copilot-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.alternatives-body { display: grid; gap: 12px; max-height: 58dvh; padding: 0 24px 8px; overflow-y: auto; }
+.alternative-option { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 14px; border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--paper); }
+.alternative-option h4 { margin: 0 0 5px; font-size: 14px; }
+.alternative-option p { margin: 0 0 6px; color: var(--muted); font-size: 12px; line-height: 1.6; }
+.alternative-option button { flex: 0 0 auto; }
+
+@media (max-width: 900px) {
+  .overview-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 760px) {
+  /* 给固定的 AI Copilot 入口留出空间，避免遮住最后一条内容。 */
+  main { padding-bottom: 154px; }
+  .overview-hero { padding: 16px; }
+  .overview-hero h3 { font-size: 19px; }
+  .overview-hero-meta { gap: 14px; }
+  .status-cell { min-width: 0; flex: 1 1 28%; padding: 10px 11px; }
+  .view-switcher { display: flex; width: 100%; }
+  .view-switch { flex: 1; padding-inline: 10px; }
+  .day-context { align-items: flex-start; }
+  [data-view="list"] .map-panel { display: none; }
+  .stop-swap { margin-left: 0; }
+  .alternative-option { flex-direction: column; }
+  .alternative-option button { align-self: flex-start; }
+  .copilot-fab { right: 14px; bottom: calc(82px + env(safe-area-inset-bottom)); padding: 12px 15px; }
+  .copilot-fab-label { display: none; }
+  .sheet-dialog { width: calc(100vw - 20px); max-width: calc(100vw - 20px); max-height: calc(100dvh - 20px); border-radius: 18px 18px 14px 14px; }
+  .copilot-body, .alternatives-body { padding-inline: 16px; }
+  .copilot-quick { grid-template-columns: minmax(0, 1fr); }
+}
+

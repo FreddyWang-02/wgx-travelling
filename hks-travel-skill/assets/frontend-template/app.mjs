@@ -23,12 +23,45 @@ import {
   parseTravelPack,
   serializeTravelPack,
 } from "./transfer.mjs";
+import {
+  AGENT_BRIDGE_METHOD,
+  COPILOT_QUICK_ACTIONS,
+  ITINERARY_VIEWS,
+  activeConstraints,
+  alternativesFor,
+  alternativesMarkup,
+  buildAgentRequest,
+  contextSummary,
+  currentStay,
+  formatAgentRequestText,
+  groupTasksByPhase,
+  hasAgentBridge,
+  isItineraryItemLocked,
+  itineraryItemContext,
+  liveRecheckCount,
+  lockedConstraintsMarkup,
+  nextItineraryItem,
+  planningReasonsFor,
+  planningReasonsMarkup,
+  preferenceChips,
+  preferenceNoteList,
+  quickActionRequestText,
+  quickActionsMarkup,
+  recheckSnapshot,
+  replanSummaries,
+  sourceFreshness,
+  swapEntryLabel,
+  swapRequestText,
+  tripStatusLabel,
+  upcomingTransport,
+} from "./ux.mjs";
 
 const state = {
   pack: null,
   revision: null,
   mode: "read",
-  tab: "travel",
+  tab: "overview",
+  itineraryView: "list",
   purpose: "outbound",
   segmentId: null,
   dayId: "all",
@@ -54,7 +87,11 @@ const state = {
   dragActivated: false,
   placeSearchQuery: "",
   mapMode: localStorage.getItem("travel-wallet-map-mode") === "basemap" ? "basemap" : "schematic",
-  selectedMapItemId: null,
+  // List 与 Map 共用同一个选中状态，避免两套焦点互相不同步。
+  selectedItineraryItemId: null,
+  copilotAction: null,
+  copilotText: "",
+  copilotSource: null,
 };
 
 const $ = (selector) => document.querySelector(selector);
@@ -203,6 +240,13 @@ function pointDate(point) {
   return point?.localDate ? formatDate(point.localDate, { weekday: true }) : "日期待定";
 }
 
+// 本机时区的今天与当前时间，用于「下一项」和来源时效推导。
+function localNow() {
+  const now = new Date();
+  const shifted = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+  return { date: shifted.toISOString().slice(0, 10), time: shifted.toISOString().slice(11, 16) };
+}
+
 function personName(id) {
   return state.pack.companions.find((person) => person.id === id)?.name || id;
 }
@@ -221,6 +265,8 @@ function heading(kicker, title, subtitle, actions = "") {
 function renderState(title, message, symbol = "map-pinned") {
   $("#tripHeader").hidden = true;
   $("#moduleNav").hidden = true;
+  const fab = $("#copilotFab");
+  if (fab) fab.hidden = true;
   $("#app").innerHTML = `<section class="state-view">${icon(symbol)}<h1>${esc(title)}</h1><p>${esc(message)}</p></section>`;
   refreshIcons();
 }
@@ -254,19 +300,123 @@ function renderShell() {
   $("#agentButton").hidden = state.mode !== "edit";
   $("#dataButton").hidden = state.mode !== "edit";
   $("#saveState").hidden = state.mode !== "edit";
+  const schemaKicker = $("#dataDialogKicker");
+  if (schemaKicker) schemaKicker.textContent = `TRAVELPACK ${state.pack.schemaVersion || ""}`.trim();
+  const fab = $("#copilotFab");
+  if (fab) fab.hidden = false;
   document.title = `${trip.title}｜旅行票夹`;
   document.querySelectorAll("[data-tab]").forEach((button) => button.classList.toggle("active", button.dataset.tab === state.tab));
 }
 
-function travelView() {
+// ── 概览 Overview ────────────────────────────────────────────────────────────
+// 概览继承原「出行」模块的全部交通与住宿能力（票面、分段、编辑、票据、附件）。
+
+function overviewStatusStrip() {
+  const status = tripStatusLabel(state.pack.tripStatus);
+  const recheck = recheckSnapshot(state.pack);
+  const live = recheck ? liveRecheckCount(state.pack) : 0;
+  const locked = activeConstraints(state.pack).length;
+  const cells = [
+    status ? `<div class="status-cell"><small>旅行状态</small><strong>${esc(status)}</strong></div>` : "",
+    locked ? `<div class="status-cell"><small>已锁定安排</small><strong>${locked} 项</strong></div>` : "",
+    recheck ? `<div class="status-cell"><small>待复核信息</small><strong>${recheck.count} 项</strong></div>` : "",
+  ].filter(Boolean).join("");
+  if (!cells) return "";
+  return `<div class="overview-status">${cells}${recheck && live !== recheck.count
+    ? `<p class="plain-note">${esc(recheck.text)}；按当前资料重算为 ${live} 项。</p>`
+    : ""}</div>`;
+}
+
+function overviewNextItem() {
+  const next = nextItineraryItem(state.pack, localNow());
+  if (!next) return `<section class="detail-sheet overview-next"><div class="detail-block"><h3>${icon("calendar-clock")} 下一项计划</h3><p class="plain-note">这份行程还没有可以推断的后续节点。</p></div></section>`;
+  const title = next.estimated ? "下一项计划" : "接下来";
+  return `<section class="detail-sheet overview-next"><div class="detail-block">
+    <h3>${icon("calendar-clock")} ${title}</h3>
+    <p class="overview-next-main"><b>${esc(next.place?.name || next.item.title || "行程节点")}</b><span>${esc(next.item.startTime || "—")}–${esc(next.item.endTime || "—")}</span></p>
+    <p class="plain-note">${esc(next.day?.title || "")}${next.day ? ` · ${esc(next.day.date)}` : ""}${next.item.notes ? `<br>${esc(next.item.notes)}` : ""}</p>
+    ${next.estimated ? `<p class="plain-note">暂未接入实时时间，这里按行程顺序显示下一项。</p>` : ""}
+    <div class="overview-next-actions">${state.mode === "edit" ? `<button class="text-button" data-open-editor="itinerary" data-record-id="${esc(next.item.id)}">${icon("pencil")} 编辑这一项</button>` : ""}<button class="text-button" data-tab="itinerary">${icon("route")} 打开行程</button></div>
+  </div></section>`;
+}
+
+function overviewLockedSection() {
+  return lockedConstraintsMarkup(state.pack);
+}
+
+function overviewPreferences() {
+  const chips = preferenceChips(state.pack.preferences);
+  const notes = preferenceNoteList(state.pack.preferences);
+  if (!chips.length && !notes.length) return "";
+  return `<section class="list-section preference-section"><div class="field-heading"><h3>你的旅行偏好</h3><span>${chips.length}</span></div>
+    <div class="preference-chips">${chips.map((chip) => `<span class="preference-chip">${esc(chip.label)}</span>`).join("")}</div>
+    ${notes.length ? `<ul class="preference-notes">${notes.map((note) => `<li>${esc(note)}</li>`).join("")}</ul>` : ""}
+    ${state.mode === "edit" ? `<button class="text-button" data-open-editor="trip">${icon("pencil")} 编辑偏好</button>` : ""}
+  </section>`;
+}
+
+function overviewReplanSection() {
+  const entries = replanSummaries(state.pack, (id) => state.pack.days.find((day) => day.id === id)?.title || "");
+  if (!entries.length) return "";
+  return `<section class="list-section replan-section"><div class="field-heading"><h3>AI 最近调整</h3><span>${entries.length}</span></div>
+    ${entries.map((entry) => `<div class="replan-row"><div><h4>${esc(entry.triggerLabel)}<span class="replan-status">${esc(entry.statusLabel)}</span></h4><p>${esc(entry.summary)}</p><small>${esc(entry.dayLabels.filter(Boolean).join("、") || "全程")}${entry.createdAt ? ` · ${esc(String(entry.createdAt).replace("T", " "))}` : ""}</small></div></div>`).join("")}
+  </section>`;
+}
+
+function overviewTransportSection() {
+  const segment = upcomingTransport(state.pack);
+  const stay = currentStay(state.pack);
+  const stayPlace = stay ? state.pack.places.find((place) => place.id === stay.placeId) : null;
+  const rows = [
+    segment ? `<div class="list-row"><div><h4>${esc(labels[segment.purpose] || "交通")} · ${esc(segment.from?.name || "出发地")} → ${esc(segment.to?.name || "目的地")}</h4><p>${esc(pointDate(segment.departure))} · ${esc(segment.departure?.localTime || "—")} · ${esc(segment.serviceNumber || labels[segment.mode] || "交通")}<br>${esc(labels[segment.status] || segment.status || "")}</p></div><span class="tag">${esc(labels[segment.mode] || "交通")}</span></div>` : "",
+    stay ? `<div class="list-row"><div><h4>${esc(stayPlace?.name || "住宿")}</h4><p>${esc(stay.checkIn)} 入住 · ${esc(stay.checkOut)} 退房<br>${esc(labels[stay.status] || stay.status || "")}</p></div>${state.mode === "edit" ? `<div class="row-actions"><button class="row-edit" data-open-editor="stay" data-record-id="${esc(stay.id)}" aria-label="编辑住宿">${icon("pencil")}</button></div>` : `<span class="tag">住宿</span>`}</div>` : "",
+  ].filter(Boolean).join("");
+  if (!rows) return "";
+  return `<section class="list-section overview-transport"><div class="field-heading"><h3>交通与住宿</h3><span>摘要</span></div>${rows}</section>`;
+}
+
+function overviewView() {
+  const { trip } = state.pack;
+  const companions = state.pack.companions || [];
+  return `<section class="view overview-view">
+    ${heading("OVERVIEW", "概览", "先把这趟旅行最重要的部分放在一起，再往下进入各个模块。", state.mode === "edit" ? `<button class="text-button primary-action" data-open-editor="transport">${icon("plus")} <span class="desktop-add-label">新增出行</span><span class="compact-label">新增</span></button>` : "")}
+    <section class="overview-hero">
+      <div>
+        <h3>${esc(trip.title)}</h3>
+        <p>${esc(formatDate(trip.startDate))} — ${esc(formatDate(trip.endDate))} · ${esc(trip.destination || trip.subtitle || "旅行")}</p>
+      </div>
+      <div class="overview-hero-meta">
+        <span><b>${state.pack.days.length}</b>天</span>
+        <span><b>${companions.length}</b>位同行</span>
+        <span><b>${state.pack.itineraryItems.length}</b>个节点</span>
+      </div>
+    </section>
+    ${overviewStatusStrip()}
+    <div class="overview-grid">
+      <div class="overview-main">
+        ${overviewNextItem()}
+        ${overviewLockedSection()}
+        ${overviewTransportSection()}
+      </div>
+      <div class="overview-side">
+        ${overviewPreferences()}
+        ${overviewReplanSection()}
+      </div>
+    </div>
+    ${transportPanelSection()}
+  </section>`;
+}
+
+// 原「出行」模块的完整能力（分段、票面、时间、票据、附件、编辑）在这里原样保留。
+function transportPanelSection() {
   const segments = state.pack.transportSegments.filter((segment) => segment.purpose === state.purpose);
   if (!segments.some((segment) => segment.id === state.segmentId)) state.segmentId = segments[0]?.id || null;
   const current = segments.find((segment) => segment.id === state.segmentId);
   const currentIndex = state.pack.transportSegments.findIndex((segment) => segment.id === state.segmentId);
   const next = currentIndex >= 0 ? state.pack.transportSegments[currentIndex + 1] : null;
 
-  return `<section class="view travel-view">
-    ${heading("TRAVEL", "出行", "从出发到抵达，把每一段安排收好。", state.mode === "edit" ? `<button class="text-button" aria-label="查看历史">${icon("archive")} <span class="desktop-history-label">历史</span></button><button class="text-button primary-action" data-open-editor="transport" aria-label="添加交通">${icon("plus")} <span class="desktop-add-label">新增出行</span><span class="compact-label">新增</span></button>` : "")}
+  return `<section class="overview-travel">
+    <div class="field-heading overview-section-title"><h3>${icon("tickets-plane")} 出行票据与途中交通</h3><span>${state.pack.transportSegments.length} 段</span></div>
     <div class="tabs">
       ${["outbound", "intermediate", "return"].map((purpose) => `<button class="tab-chip ${purpose === state.purpose ? "active" : ""}" data-purpose="${purpose}">${labels[purpose]}</button>`).join("")}
     </div>
@@ -347,12 +497,19 @@ function itineraryStopCard(item) {
   const place = state.pack.places.find((entry) => entry.id === item.placeId);
   const links = recordLinks(item.links || [], place?.links || []);
   const hasDetails = Boolean(place?.address || place?.notes || item.notes || links.length);
-  return `<article class="route-stop ${state.selectedMapItemId === item.id ? "is-selected" : ""}" data-map-item="${esc(item.id)}" data-drag-item="${esc(item.id)}">
+  const locked = isItineraryItemLocked(state.pack, item.id);
+  // 当日已在上方展示的理由不再重复贴到卡片上；全程视图没有当日区，卡片补上所属日期的理由。
+  const shownAtDayLevel = new Set((state.dayId === "all" ? [] : planningReasonsFor(state.pack, { dayId: state.dayId })).map((entry) => entry.id));
+  const reasons = planningReasonsFor(state.pack, { itineraryItemId: item.id, dayId: item.dayId, placeId: item.placeId }).filter((entry) => !shownAtDayLevel.has(entry.id));
+  const swaps = alternativesFor(state.pack, { itineraryItemId: item.id, placeId: item.placeId });
+  const hasExtras = locked || reasons.length || swaps.length;
+  return `<article class="route-stop ${state.selectedItineraryItemId === item.id ? "is-selected" : ""}" data-map-item="${esc(item.id)}" data-drag-item="${esc(item.id)}">
     <span class="stop-index">${item.displayOrder || item.order + 1}</span>
     <div class="stop-card">
       <header class="stop-card-top">
         ${state.mode === "edit" ? `<button class="drag-handle" type="button" data-touch-drag="${esc(item.id)}" aria-label="按住拖动行程" title="按住并拖动排序">${icon("grip-vertical")}</button>` : ""}
         <span class="stop-clock">${icon("clock-3")} <b>${esc(item.startTime || "—")}</b><small>${item.endTime ? `–${esc(item.endTime)}` : ""}</small></span>
+        ${locked ? `<span class="lock-mark" role="img" aria-label="已锁定安排" title="已锁定安排，AI 调整时不会自动移动。">🔒</span>` : ""}
         <span class="tag">${esc(labels[item.kind] || item.kind)}</span>
         ${state.mode === "edit" ? `<div class="stop-menu"><button data-open-editor="itinerary" data-record-id="${esc(item.id)}" aria-label="编辑">${icon("pencil")}</button><button class="danger" data-delete-kind="itinerary" data-record-id="${esc(item.id)}" aria-label="删除">${icon("trash-2")}</button></div>` : ""}
       </header>
@@ -360,9 +517,18 @@ function itineraryStopCard(item) {
         <span class="stop-visual">${icon(item.kind === "meal" ? "utensils" : item.kind === "shopping" ? "shopping-bag" : "map-pin")}</span>
         <div class="stop-main"><h3>${esc(place?.name || item.title || "自由活动")}</h3><p>${esc(item.notes || place?.notes || "行程说明待补充")}</p></div>
       </div>
+      ${hasExtras ? `<div class="stop-extras">
+        ${locked ? `<p class="stop-lock">🔒 已锁定安排，AI 调整时不会自动移动。</p>` : ""}
+        ${planningReasonsMarkup(reasons)}
+        ${swaps.length ? `<button class="text-button stop-swap" data-open-alternatives="${esc(item.id)}">${icon("shuffle")} ${esc(swapEntryLabel(swaps))} <span class="swap-count">${swaps.length}</span></button>` : ""}
+      </div>` : ""}
       ${hasDetails ? `<details class="place-details"><summary>查看地点详情与攻略</summary><div class="place-detail-body">${place?.address ? `<p>${icon("map-pin")} ${esc(place.address)}</p>` : ""}${links.length ? `<div class="place-links">${links.map((link) => `<a href="${esc(link.safe)}" target="_blank" rel="noopener noreferrer">${esc(link.title || "攻略链接")} ${icon("arrow-up-right")}</a>`).join("")}</div>` : ""}</div></details>` : ""}
     </div>
   </article>`;
+}
+
+function itineraryViewSwitcher() {
+  return `<div class="view-switcher" role="tablist" aria-label="行程视图">${ITINERARY_VIEWS.map((view) => `<button class="view-switch ${state.itineraryView === view.id ? "active" : ""}" role="tab" aria-selected="${state.itineraryView === view.id}" data-itinerary-view="${view.id}">${esc(view.label)}</button>`).join("")}</div>`;
 }
 
 function itineraryView() {
@@ -374,17 +540,22 @@ function itineraryView() {
   const alternatives = state.pack.places.filter((place) => place.alternative);
   const selectedDay = days.find((day) => day.id === state.dayId);
   const dayTheme = selectedDay?.title || "全程总览";
+  const dayReasons = selectedDay ? planningReasonsFor(state.pack, { dayId: selectedDay.id }) : [];
 
-  return `<section class="view">
-    ${heading("ITINERARY", "每日行程", "地图顺序与行程节点保持一致，路线为游览顺序示意。")}
+  return `<section class="view" data-view="${esc(state.itineraryView)}">
+    ${heading("ITINERARY", "行程", "地图顺序与行程节点保持一致，路线为游览顺序示意。")}
     ${state.mode === "edit" ? `<div class="module-actions"><button class="text-button primary-action" data-open-editor="itinerary">${icon("plus")} 添加行程</button><button class="text-button" data-open-editor="place" data-default-day="${state.dayId === "all" ? "" : esc(state.dayId)}">添加地点</button><button class="text-button" data-open-editor="stay">添加住宿</button></div>` : ""}
     <div class="day-strip">
       <button class="day-button ${state.dayId === "all" ? "active" : ""}" data-day="all"><b class="day-date">全程</b><small>${days.length} 天</small></button>
       ${days.map((day) => `<button class="day-button ${state.dayId === day.id ? "active" : ""}" data-day="${esc(day.id)}" data-drop-day="${esc(day.id)}"><b class="day-date">${esc(day.date.slice(5).replace("-", "/"))}</b><small>${esc(weekdayLabel(day.date))}</small></button>`).join("")}
     </div>
-    <div class="day-context"><small>${selectedDay ? "当日主题" : "行程主题"}</small><h3>${esc(dayTheme)}</h3></div>
+    <div class="day-context"><div><small>${selectedDay ? "当日主题" : "行程主题"}</small><h3>${esc(dayTheme)}</h3></div>
+      ${selectedDay ? `<button class="text-button ai-day-button" data-copilot-action="replan-day" data-copilot-day="${esc(selectedDay.id)}"><span aria-hidden="true">✨</span> 调整这一天</button>` : ""}
+    </div>
+    ${planningReasonsMarkup(dayReasons, { className: "day-reasons" })}
+    ${itineraryViewSwitcher()}
     <div class="itinerary-grid">
-      <div>
+      <div class="itinerary-col-list">
         <p class="drag-instruction">${icon("grip-vertical")} 拖动把手调整顺序，列表与地图会同步更新</p>
         <div class="route-list" data-drop-list="true">
           ${items.map(itineraryStopCard).join("") || `<p class="plain-note">当前日期没有行程节点。</p>`}
@@ -499,7 +670,7 @@ function mountOpenStreetMap(host, fallbackNotice = "") {
       }).addTo(state.map);
       marker.bindTooltip(`${day.date} · ${place.name}`);
       marker.on("click", () => {
-        state.selectedMapItemId = item.id;
+        state.selectedItineraryItemId = item.id;
         renderMapDetail();
         document.querySelectorAll(".route-stop").forEach((stop) => stop.classList.toggle("is-selected", stop.dataset.mapItem === item.id));
       });
@@ -528,11 +699,11 @@ function mountSchematicMap(host, message) {
     return dayDelta || a.order - b.order;
   });
   const points = layoutSchematicPoints(items, state.pack.places);
-  if (!state.selectedMapItemId || !items.some((item) => item.id === state.selectedMapItemId)) state.selectedMapItemId = items[0]?.id || null;
+  if (!state.selectedItineraryItemId || !items.some((item) => item.id === state.selectedItineraryItemId)) state.selectedItineraryItemId = items[0]?.id || null;
   const polyline = points.map((point) => `${point.x},${point.y}`).join(" ");
   host.innerHTML = points.length ? `<div class="map-city-canvas" aria-label="绘制路线地图">
     <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path class="map-grid-line" d="M0 18H100M0 42H100M0 68H100M16 0V100M42 0V100M70 0V100"/><polyline class="schematic-path" points="${polyline}"/></svg>
-    ${points.map(({ item, x, y }, index) => { const place = state.pack.places.find((entry) => entry.id === item.placeId); return `<button class="map-marker ${item.id === state.selectedMapItemId ? "active" : ""}" style="--x:${x}%;--y:${y}%" data-select-map-item="${esc(item.id)}" aria-label="查看${esc(place?.name || "地点")}"><b>${index + 1}</b><span>${esc(place?.name || "行程地点")}</span></button>`; }).join("")}
+    ${points.map(({ item, x, y }, index) => { const place = state.pack.places.find((entry) => entry.id === item.placeId); return `<button class="map-marker ${item.id === state.selectedItineraryItemId ? "active" : ""}" style="--x:${x}%;--y:${y}%" data-select-map-item="${esc(item.id)}" aria-label="查看${esc(place?.name || "地点")}"><b>${index + 1}</b><span>${esc(place?.name || "行程地点")}</span></button>`; }).join("")}
     <span class="map-north">N<br>▲</span>
   </div>` : `<p class="schematic-empty">当前日期没有可绘制的行程节点。</p>`;
   renderMapDetail();
@@ -540,10 +711,19 @@ function mountSchematicMap(host, message) {
   if (status) status.textContent = `${message} 此图表示节点顺序，不代表真实道路、距离或耗时。`;
 }
 
+// List 与 Map 共用同一个选中状态：任一侧变化都同步另一侧。
+function selectItineraryItem(itemId) {
+  if (!itemId || state.selectedItineraryItemId === itemId) return;
+  state.selectedItineraryItemId = itemId;
+  document.querySelectorAll(".map-marker").forEach((marker) => marker.classList.toggle("active", marker.dataset.selectMapItem === itemId));
+  document.querySelectorAll(".route-stop").forEach((stop) => stop.classList.toggle("is-selected", stop.dataset.mapItem === itemId));
+  renderMapDetail();
+}
+
 function renderMapDetail() {
   const host = $("#mapDetail");
   if (!host) return;
-  const item = state.pack.itineraryItems.find((entry) => entry.id === state.selectedMapItemId);
+  const item = state.pack.itineraryItems.find((entry) => entry.id === state.selectedItineraryItemId);
   if (!item) return void (host.innerHTML = "");
   const place = state.pack.places.find((entry) => entry.id === item.placeId);
   const links = recordLinks(item.links || [], place?.links || []);
@@ -567,18 +747,21 @@ function prepareView() {
   const pending = tasks.filter((task) => task.status === "pending").length;
   const nextTask = tasks.filter((task) => task.status === "pending" && task.dueAt?.localDate).sort((a, b) => a.dueAt.localDate.localeCompare(b.dueAt.localDate))[0];
   const taskRow = (task) => `<div class="list-row task-row ${task.status === "done" ? "is-done" : ""}">${state.mode === "edit" ? `<input class="task-check" type="checkbox" data-toggle-task="${esc(task.id)}" aria-label="切换${esc(task.title)}状态" ${task.status === "done" ? "checked" : ""}>` : `<span class="task-check ${task.status === "done" ? "done" : ""}">${task.status === "done" ? icon("check") : ""}</span>`}<div class="task-main"><h4>${esc(task.title)}</h4><p>${esc(task.notes || labels[task.kind] || "")}</p><span class="tag">${esc(labels[task.kind] || task.kind)}</span></div>${task.dueAt?.localDate ? `<time class="task-due">${esc(formatDate(task.dueAt.localDate, { weekday: true }))}<br>${esc(task.dueAt.localTime || "")}</time>` : ""}${state.mode === "edit" ? `<div class="row-actions"><button data-calendar-task="${esc(task.id)}" aria-label="添加到手机日历">${icon("calendar-plus")}</button><button class="row-edit" data-open-editor="task" data-record-id="${esc(task.id)}" aria-label="编辑待办">${icon("pencil")}</button><button class="row-delete" data-delete-kind="task" data-record-id="${esc(task.id)}" aria-label="删除待办">${icon("trash-2")}</button></div>` : ""}</div>`;
+  // 按出发前的时间阶段组织事项；阶段由 dueAt 与旅行日期推导，不新增 TravelPack 字段。
+  const groups = groupTasksByPhase({ ...state.pack, tasks: tasks.filter((task) => task.kind !== "packing") });
+  const packing = tasks.filter((task) => task.kind === "packing");
   return `<section class="view">
-    ${heading("PREPARE", "准备", "待办与行李分开整理，出发前逐项确认。")}
+    ${heading("PREPARE", "准备", "按出发前的时间阶段整理事项，出发前逐项确认。")}
     ${state.mode === "edit" ? `<div class="module-actions"><button class="text-button primary-action" data-open-editor="task">${icon("plus")} 新增待办</button><button class="text-button" data-export-ics="true">${icon("calendar-plus")} 导出日历文件</button></div>` : ""}
     <div class="summary-band">
       <div class="summary-cell"><small>待完成</small><strong>${pending}</strong></div>
       <div class="summary-cell"><small>已完成</small><strong>${completed}</strong></div>
       <div class="summary-cell"><small>下一项</small><strong>${esc(nextTask?.dueAt?.localDate?.slice(5) || "—")}</strong></div>
     </div>
-    <div class="prepare-grid">
-      <section class="list-section"><div class="field-heading"><h3>出行待办</h3><span>${tasks.filter((task) => task.kind !== "packing").length}</span></div>${tasks.filter((task) => task.kind !== "packing").map(taskRow).join("") || `<p class="plain-note">暂无事项。</p>`}</section>
-      <section class="list-section"><div class="field-heading"><h3>行李里，别忘了</h3><span>${tasks.filter((task) => task.kind === "packing").length}</span></div>${tasks.filter((task) => task.kind === "packing").map(taskRow).join("") || `<p class="plain-note">暂无携带物品。</p>`}</section>
+    <div class="prepare-phases">
+      ${groups.map((group) => `<section class="list-section phase-section"><div class="field-heading"><h3>${esc(group.phase)}</h3><span>${group.tasks.length}</span></div>${group.tasks.map(taskRow).join("")}</section>`).join("") || `<section class="list-section"><p class="plain-note">暂无待办事项。</p></section>`}
     </div>
+    <section class="list-section"><div class="field-heading"><h3>行李里，别忘了</h3><span>${packing.length}</span></div>${packing.map(taskRow).join("") || `<p class="plain-note">暂无携带物品。</p>`}</section>
   </section>`;
 }
 
@@ -590,6 +773,7 @@ function expensesView() {
   const ledger = buildLedger(state.pack, state.currency);
   const settlements = suggestSettlements(ledger);
   const totalReceivable = ledger.reduce((sum, row) => sum + row.receivable, 0);
+  const totalPayable = ledger.reduce((sum, row) => sum + row.payable, 0);
   const allocationSummary = (expense) => expense.allocations
     .map((allocation) => `${personName(allocation.personId)} ${formatMoney(allocation.amountMinor, expense.currency)}`)
     .join("、");
@@ -598,13 +782,13 @@ function expensesView() {
     ${state.mode === "edit" ? `<div class="module-actions"><button class="text-button primary-action" data-open-editor="expense">${icon("plus")} 记一笔</button></div>` : ""}
     <div class="tabs">${currencies.map((currency) => `<button class="tab-chip ${currency === state.currency ? "active" : ""}" data-currency="${currency}">${currency}</button>`).join("")}</div>
     <div class="summary-band">
-      <div class="summary-cell"><small>总支出</small><strong>${expenses.length ? esc(formatMoney(total, state.currency)) : "—"}</strong></div>
-      <div class="summary-cell"><small>账单笔数</small><strong>${expenses.length}</strong></div>
-      <div class="summary-cell"><small>同行人数</small><strong>${state.pack.companions.length}</strong></div>
+      <div class="summary-cell"><small>已花</small><strong>${expenses.length ? esc(formatMoney(total, state.currency)) : "—"}</strong></div>
+      <div class="summary-cell"><small>应收合计</small><strong>${ledger.length ? esc(formatMoney(totalReceivable, state.currency)) : "—"}</strong></div>
+      <div class="summary-cell"><small>应付合计</small><strong>${ledger.length ? esc(formatMoney(totalPayable, state.currency)) : "—"}</strong></div>
     </div>
     <div class="expense-grid">
       <div>
-        <section class="list-section"><h3>每日费用</h3>${expenses.map((expense) => `<div class="list-row"><div><h4>${esc(expense.title)}</h4><p>${esc(expense.date)} · ${esc(personName(expense.payerId))} 实际支付 · ${esc(expense.category || "其他")}<br>分摊：${esc(allocationSummary(expense))}${expense.notes ? ` · ${esc(expense.notes)}` : ""}</p></div><strong>${esc(formatMoney(expense.amountMinor, expense.currency))}</strong>${state.mode === "edit" ? `<div class="row-actions"><button class="row-edit" data-open-editor="expense" data-record-id="${esc(expense.id)}" aria-label="编辑账单">${icon("pencil")}</button><button class="row-delete" data-delete-kind="expense" data-record-id="${esc(expense.id)}" aria-label="删除账单">${icon("trash-2")}</button></div>` : ""}</div>`).join("") || `<p class="plain-note">还没有账单。</p>`}</section>
+        <section class="list-section"><div class="field-heading"><h3>每日费用</h3><span>${expenses.length} 笔 · ${state.pack.companions.length} 人</span></div>${expenses.map((expense) => `<div class="list-row"><div><h4>${esc(expense.title)}</h4><p>${esc(expense.date)} · ${esc(personName(expense.payerId))} 实际支付 · ${esc(expense.category || "其他")}<br>分摊：${esc(allocationSummary(expense))}${expense.notes ? ` · ${esc(expense.notes)}` : ""}</p></div><strong>${esc(formatMoney(expense.amountMinor, expense.currency))}</strong>${state.mode === "edit" ? `<div class="row-actions"><button class="row-edit" data-open-editor="expense" data-record-id="${esc(expense.id)}" aria-label="编辑账单">${icon("pencil")}</button><button class="row-delete" data-delete-kind="expense" data-record-id="${esc(expense.id)}" aria-label="删除账单">${icon("trash-2")}</button></div>` : ""}</div>`).join("") || `<p class="plain-note">还没有账单。</p>`}</section>
       </div>
       <aside class="side-stack">
         <nav class="expense-subtabs" aria-label="记账结果视图">
@@ -635,12 +819,12 @@ function materialsView() {
         return `<article class="material-row"><span class="material-icon">${icon(materialIcon[material.kind] || "file")}</span><div><h3>${esc(material.title)}</h3><p>${esc(material.description || "")}</p><span class="tag">${esc(labels[material.kind] || material.kind)}</span>${attachmentLinks}</div>${actions}</article>`;
       }).join("") || `<p class="plain-note">这一分类暂无资料。</p>`}
     </div>
-    <section class="source-list list-section"><h3>来源记录</h3><p>动态信息显示核验状态和有效期，临行前按状态复核。</p>${state.pack.sources.map((source) => { const url = safeUrl(source.url); const freshness = source.freshness || {}; const status = freshness.status === "current" ? "当前有效" : "需要复核"; return `<div class="list-row"><div><h4>${esc(source.title)} <span class="freshness-badge ${esc(freshness.status || "needs-recheck")}">${status}</span></h4><p>${esc(source.platform)} · 核验于 ${esc(freshness.checkedAt || source.retrievedAt)}${freshness.publishedAt ? ` · 发布于 ${esc(freshness.publishedAt)}` : ""}${freshness.validUntil ? ` · 有效至 ${esc(freshness.validUntil)}` : ""}<br>${esc(source.note || "")}</p></div>${url ? `<a class="open-link" href="${esc(url)}" target="_blank" rel="noopener noreferrer">打开 ${icon("arrow-up-right")}</a>` : ""}</div>`; }).join("")}</section>
+    <section class="source-list list-section"><div class="field-heading"><h3>来源记录</h3><span>${state.pack.sources.length}</span></div><p>动态信息显示核验状态和有效期，临行前按状态复核。</p>${state.pack.sources.map((source) => { const url = safeUrl(source.url); const freshness = source.freshness || {}; const state_ = sourceFreshness(source, localNow().date); return `<div class="list-row"><div><h4>${esc(source.title)} <span class="freshness-badge ${esc(state_.tone)}">${esc(state_.label)}</span></h4><p>${esc(source.platform)} · 核验于 ${esc(freshness.checkedAt || source.retrievedAt)}${freshness.publishedAt ? ` · 发布于 ${esc(freshness.publishedAt)}` : ""}${freshness.validUntil ? ` · 有效至 ${esc(freshness.validUntil)}` : ""}<br>${esc(source.note || "")}</p></div>${url ? `<a class="open-link" href="${esc(url)}" target="_blank" rel="noopener noreferrer">打开 ${icon("arrow-up-right")}</a>` : ""}</div>`; }).join("") || `<p class="plain-note">还没有来源记录。</p>`}</section>
   </section>`;
 }
 
 const views = {
-  travel: travelView,
+  overview: overviewView,
   itinerary: itineraryView,
   prepare: prepareView,
   expenses: expensesView,
@@ -655,7 +839,7 @@ function render() {
     state.map = null;
   }
   renderShell();
-  $("#app").innerHTML = views[state.tab]();
+  $("#app").innerHTML = views[state.tab] ? views[state.tab]() : overviewView();
   refreshIcons();
   if (state.tab === "itinerary") {
     mountMap();
@@ -675,10 +859,121 @@ async function ensureEditReady() {
   }
 }
 
+// ── AI Copilot（全局能力，不是一级模块）─────────────────────────────────────────
+// 前端不保存模型 Key、不硬编码模型接口：有宿主桥接时交给宿主，没有时给出可复制的 Skill 请求。
+
+function copilotDayLabel(dayId) {
+  const day = state.pack.days.find((entry) => entry.id === dayId);
+  return day ? `${day.title}（${day.date}）` : "";
+}
+
+function copilotDraft() {
+  const dayId = state.copilotSource?.dayId ?? (state.dayId === "all" ? null : state.dayId);
+  const itineraryItemId = state.copilotSource?.itineraryItemId ?? state.selectedItineraryItemId ?? null;
+  const quick = COPILOT_QUICK_ACTIONS.find((entry) => entry.id === state.copilotAction) || null;
+  const typed = String(state.copilotText || "").trim();
+  const text = typed || quickActionRequestText(quick);
+  const request = buildAgentRequest({
+    action: quick?.action || "freeform",
+    pack: state.pack,
+    text,
+    module: state.tab,
+    dayId,
+    itineraryItemId,
+  });
+  const context = itineraryItemContext(state.pack, itineraryItemId);
+  return { request, quick, text, dayId, itineraryItemId, dayLabel: copilotDayLabel(dayId), placeName: context?.place?.name || "" };
+}
+
+function renderCopilot() {
+  if (!state.pack) return;
+  const bridged = hasAgentBridge(hostAdapter);
+  const draft = copilotDraft();
+  $("#copilotContext").textContent = `${contextSummary(state.pack, { module: state.tab, dayId: draft.dayId, itineraryItemId: draft.itineraryItemId })} · 打开时已带上当前页面上下文。`;
+  $("#copilotQuick").innerHTML = quickActionsMarkup(state.copilotAction);
+  const textarea = $("#copilotText");
+  if (document.activeElement !== textarea) textarea.value = state.copilotText;
+  const box = $("#copilotRequest");
+  const hasRequest = Boolean(draft.text);
+  box.hidden = !hasRequest;
+  if (!hasRequest) return;
+  $("#copilotRequestTitle").textContent = draft.quick ? draft.quick.label : "调整请求";
+  $("#copilotMode").textContent = bridged ? "交给当前 Agent" : "复制给 Skill Agent";
+  $("#copilotRequestText").value = formatAgentRequestText(draft.request, {
+    tripTitle: state.pack.trip.title,
+    dayTitle: draft.dayLabel,
+    placeName: draft.placeName,
+  });
+  $("#copilotSend").hidden = !bridged;
+  $("#copilotHint").textContent = bridged
+    ? "提交后由当前宿主的 Agent 处理；网页本身不会直接改写旅行数据。"
+    : "网页不会自动重规划。请把这段请求交给安装了 AI Travel Copilot Skill 的 Agent。";
+  refreshIcons();
+}
+
+function openCopilot({ action = null, text = "", source = null } = {}) {
+  state.copilotAction = action;
+  state.copilotText = text;
+  state.copilotSource = source;
+  renderCopilot();
+  const dialog = $("#copilotDialog");
+  if (!dialog.open) dialog.showModal();
+}
+
+async function copyCopilotRequest() {
+  const field = $("#copilotRequestText");
+  if (!field.value) return;
+  try {
+    await navigator.clipboard.writeText(field.value);
+    toast("调整请求已复制");
+  } catch {
+    field.focus();
+    field.select();
+    toast("请手动复制选中的请求");
+  }
+}
+
+async function sendCopilotRequest() {
+  if (!hasAgentBridge(hostAdapter)) return;
+  const draft = copilotDraft();
+  const button = $("#copilotSend");
+  button.disabled = true;
+  try {
+    const result = await hostAdapter[AGENT_BRIDGE_METHOD](draft.request);
+    toast(result?.message || "调整请求已交给当前 Agent");
+  } catch (error) {
+    toast(error?.message || "宿主暂时无法处理，可复制请求交给 Agent");
+  } finally {
+    button.disabled = false;
+  }
+}
+
+function openAlternatives(itemId) {
+  const context = itineraryItemContext(state.pack, itemId);
+  if (!context) return;
+  state.selectedItineraryItemId = itemId;
+  const list = alternativesFor(state.pack, { itineraryItemId: itemId, placeId: context.item.placeId });
+  $("#alternativesNote").textContent = `当前：${context.place?.name || "行程节点"}。选择替代方案会先生成一条变更请求，网页不会直接改写整份旅行数据。`;
+  $("#alternativesBody").innerHTML = alternativesMarkup(list);
+  $("#alternativesDialog").showModal();
+  refreshIcons();
+}
+
+function requestSwap(alternativeId) {
+  const alternative = (state.pack.alternatives || []).find((entry) => entry.id === alternativeId);
+  if (!alternative) return;
+  const itemId = state.selectedItineraryItemId;
+  const context = itineraryItemContext(state.pack, itemId);
+  const text = swapRequestText(alternative, context?.place?.name || "");
+  $("#alternativesDialog").close();
+  openCopilot({ text, source: { dayId: context?.item?.dayId || null, itineraryItemId: itemId } });
+}
+
 document.addEventListener("click", async (event) => {
   const button = event.target.closest("button");
   if (!button || !state.pack) return;
-  const { tab, purpose, segment, day, currency, expensePanel, materialKind, openAttachments, attachmentMaterialId, openEditor, openSection, recordId, shiftItem, direction, exportIcs, deleteKind, defaultDay, mapMode, selectMapItem, openMapItem, calendarTask } = button.dataset;
+  // 注意：dataset 解构名不得与模块级函数同名，否则会在处理器作用域内遮蔽函数（如 openAlternatives）。
+  const { tab, purpose, segment, day, currency, expensePanel, materialKind, openAttachments, attachmentMaterialId, openEditor, openSection, recordId, shiftItem, direction, exportIcs, deleteKind, defaultDay, mapMode, selectMapItem, openMapItem, calendarTask, itineraryView: itineraryViewMode, openAlternatives: alternativesForItem, copilotDay, copilotQuick, swapAlternative } = button.dataset;
   if (openEditor) {
     if (!await ensureEditReady()) return;
     const section = { trip: "trip", itinerary: "itinerary", place: "places", stay: "places", transport: "transport", task: "tasks", expense: "expenses", material: "materials" }[openEditor];
@@ -705,6 +1000,20 @@ document.addEventListener("click", async (event) => {
     await addTasksToCalendar();
   } else if (calendarTask) {
     await addTasksToCalendar(calendarTask);
+  } else if (copilotQuick) {
+    const quick = COPILOT_QUICK_ACTIONS.find((entry) => entry.id === copilotQuick);
+    state.copilotAction = quick?.id || null;
+    state.copilotText = quickActionRequestText(quick);
+    renderCopilot();
+  } else if (copilotDay) {
+    openCopilot({ source: { dayId: copilotDay, itineraryItemId: state.selectedItineraryItemId || null } });
+  } else if (swapAlternative) {
+    requestSwap(swapAlternative);
+  } else if (alternativesForItem) {
+    openAlternatives(alternativesForItem);
+  } else if (itineraryViewMode) {
+    state.itineraryView = itineraryViewMode;
+    render();
   } else if (tab) {
     state.tab = tab;
     render();
@@ -733,10 +1042,7 @@ document.addEventListener("click", async (event) => {
     localStorage.setItem("travel-wallet-map-mode", mapMode);
     render();
   } else if (selectMapItem) {
-    state.selectedMapItemId = selectMapItem;
-    document.querySelectorAll(".map-marker").forEach((marker) => marker.classList.toggle("active", marker.dataset.selectMapItem === selectMapItem));
-    document.querySelectorAll(".route-stop").forEach((stop) => stop.classList.toggle("is-selected", stop.dataset.mapItem === selectMapItem));
-    renderMapDetail();
+    selectItineraryItem(selectMapItem);
   } else if (openMapItem) {
     const card = document.querySelector(`[data-map-item="${CSS.escape(openMapItem)}"]`);
     card?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -754,6 +1060,15 @@ document.addEventListener("change", async (event) => {
     if (!saved) input.checked = !input.checked;
     input.disabled = false;
   }
+});
+
+// 点击行程卡片本体（非按钮、链接、详情折叠区）时选中该节点，地图随之高亮。
+document.addEventListener("click", (event) => {
+  if (!state.pack) return;
+  const card = event.target.closest("[data-map-item]");
+  if (!card) return;
+  if (event.target.closest("button, a, summary, details, input, label, select, textarea")) return;
+  selectItineraryItem(card.dataset.mapItem);
 });
 
 document.addEventListener("dragstart", (event) => {
@@ -1615,6 +1930,24 @@ $("#linksDialog").addEventListener("click", async (event) => {
   const value = $(`#${button.dataset.copyLink}`).value;
   await navigator.clipboard.writeText(value);
   toast("链接已复制");
+});
+
+$("#copilotFab").addEventListener("click", () => openCopilot());
+$("#copilotClose").addEventListener("click", () => $("#copilotDialog").close());
+$("#copilotDone").addEventListener("click", () => $("#copilotDialog").close());
+$("#copilotCopy").addEventListener("click", copyCopilotRequest);
+$("#copilotSend").addEventListener("click", sendCopilotRequest);
+$("#copilotDialog").addEventListener("click", (event) => {
+  if (event.target === $("#copilotDialog")) $("#copilotDialog").close();
+});
+$("#copilotText").addEventListener("input", (event) => {
+  state.copilotText = event.target.value;
+  renderCopilot();
+});
+$("#alternativesClose").addEventListener("click", () => $("#alternativesDialog").close());
+$("#alternativesDone").addEventListener("click", () => $("#alternativesDialog").close());
+$("#alternativesDialog").addEventListener("click", (event) => {
+  if (event.target === $("#alternativesDialog")) $("#alternativesDialog").close();
 });
 
 async function load() {
