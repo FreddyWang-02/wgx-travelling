@@ -1,6 +1,12 @@
-# Hks-Travel-Skill
+# AI Travel Copilot — under active redesign
+
+Based on [Hks-Travel-Skill](https://github.com/HANKSEN/Hks-Travel-Skill) (MIT License).
+Research · Plan · Deploy · Upgrade · Redesign.
 
 [English](README_EN.md) · 中文
+
+> **Note:** This is Phase 0 of an evolution from Hks-Travel-Skill into AI Travel Copilot.
+> See [MIGRATION_PLAN.md](MIGRATION_PLAN.md) for the roadmap.
 
 Hks-Travel-Skill 是一个面向 Codex 与兼容 Agent 的旅行攻略 Skill。它把目的地研究、路线确认、六种 UI 风格预览、TravelPack 数据生成、可编辑网站部署和既有网站安全升级连成完整工作流。
 
