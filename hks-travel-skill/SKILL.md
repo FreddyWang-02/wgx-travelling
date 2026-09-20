@@ -1,6 +1,6 @@
 ---
 name: hks-travel-skill
-description: AI Travel Copilot built on Hks-Travel-Skill. Runs the trip-planning workflow in operating modes — new-trip, update-trip, local-replan, demo, deployment-upgrade — extracting intent, hard constraints and soft preferences before research, building a candidate pool, planning with constraint awareness and short explainable reasons, then producing strictly validated TravelPack 1.1.0, deploying the editable five-module web app, and safely upgrading existing deployments while preserving user data. Use for creating, updating, replanning, demoing, deploying, or upgrading a cloud travel guide; exclude direct booking, payment, and unconfirmed deployment.
+description: AI Travel Copilot built on Hks-Travel-Skill. Runs the trip-planning workflow in operating modes — new-trip, update-trip, local-replan, demo, deployment-upgrade — extracting intent, hard constraints and soft preferences before research, building a candidate pool, planning with constraint awareness and short explainable reasons, then producing strictly validated TravelPack 1.2.0, deploying the editable five-module web app, and safely upgrading existing deployments while preserving user data. Use for creating, updating, replanning, demoing, deploying, or upgrading a cloud travel guide; exclude direct booking, payment, and unconfirmed deployment.
 ---
 
 # Hks-Travel-Skill｜AI Travel Copilot
@@ -38,7 +38,7 @@ description: AI Travel Copilot built on Hks-Travel-Skill. Runs the trip-planning
     ```
 
     第二条命令会输出 `http://127.0.0.1:<port>/`。必须用宿主浏览器或浏览器工具打开该 HTTP URL；禁止把 `index.html` 作为普通文件展示，禁止使用 `file://` 完成 UI 审核。确认页面已退出"正在打开旅行票夹"状态后，实际点击风格按钮，并至少切换两种风格验证交互。随后向用户展示航空票夹、自然手账、极简导览，以及处于出行模块先行审核阶段的拼贴裁纸、印刷、都市设计六种 UI。宿主无法打开本地 HTTP 地址时，为六种风格分别生成真实浏览器截图并明确说明降级原因；禁止要求用户根据风格名称盲选。等待用户明确选择后把 `appearance.styleId` 写入 TravelPack。生成预览不代表用户已选择，UI 未确认时不得正式部署。
-11. 按 [TravelPack 1.1](references/travelpack-1.1.md) 输出完整 JSON，并执行：
+11. 按 [TravelPack 1.2](references/travelpack-1.2.md) 输出完整 JSON（新旅行默认 `schemaVersion = "1.2.0"`；继续维护既有 1.1 数据时保持 `"1.1.0"`，legacy 契约见 [TravelPack 1.1](references/travelpack-1.1.md)），并执行：
 
     ```bash
     node scripts/validate_travelpack.mjs <travelpack.json>
@@ -46,6 +46,28 @@ description: AI Travel Copilot built on Hks-Travel-Skill. Runs the trip-planning
 12. 按 [宿主能力发现与部署路由](references/deployment-routing.md) 检查当前 Agent 的宿主云、MCP、插件与已有登录状态。优先使用免费、宿主原生、无需用户提供 Key 的完整部署能力。能力判断以"可编辑、可持久化、可只读分享、可识别冲突"四项产品结果为准；用户要求附件时同时验证对象存储，用户指定微信等分享渠道时同时执行该渠道实机可达性验收。不要求宿主复刻 Cloudflare 技术栈。向用户报告校验结果、仍需复核的动态事实和拟部署宿主。只有用户明确授权部署后，才按 [数据归属与操作步骤](references/hosting.md) 操作。
 13. 部署必须遵守 [五模块产品交付契约](references/product-contract.md) 和 [云端数据契约](references/backend-contract.md)。直接复用 `assets/frontend-template/`；标准云模式可以复用 `assets/backend-template/`，宿主原生模式通过 `window.TRAVEL_HOST_ADAPTER` 接入当前 Agent 的数据库、身份和发布能力。禁止另写长篇攻略 HTML 或静态页面替代产品。宿主缺少完整云端数据闭环时继续检查下一候选；全部失败后报告能力缺口并等待用户决定。
 14. 打开真实线上地址执行五模块、数据加载和宿主能力验收。地图验收必须在浏览器中查看真实渲染结果与截图，确认道路或地标内容、标记位置、缩放和平移；只检查请求状态码不得判定底图可用。未完成真实页面验收时，禁止宣称"完整上线"或"交付完成"。
+
+## TravelPack 1.2 数据契约
+
+正式输出协议为 [TravelPack 1.2](references/travelpack-1.2.md)，它是 [TravelPack 1.1](references/travelpack-1.1.md) 的 additive extension：1.1 字段不删除、不重命名、不改语义，新能力只通过新增字段表达。`scripts/validate_travelpack.mjs` 同时支持 `1.1.0` 与 `1.2.0`。
+
+Phase 1 定义的智能行为落到以下结构：
+
+| 行为 | 字段 |
+|---|---|
+| Soft Preferences | `preferences` |
+| Hard Constraints | `constraints[]` |
+| Explainable Planning | `decisionLog[]` |
+| 候选替代方案 | `alternatives[]` |
+| 规划模式、置信度与待复核数量 | `planningMeta` |
+| Dynamic Replanning 历史 | `replanHistory[]` |
+| 旅行整体阶段 | `tripStatus` |
+
+- `local-replan` 必须写入 `replanHistory[]`，必要时同步更新 `decisionLog[]`、`alternatives[]` 与 `planningMeta.lastPlannedAt`。
+- 动态事实（航班动态、开放时间、预约状态）仍遵循 `sources[]` 的 freshness 规则，不由新字段替代。
+- 新增字段只保存简短、用户可理解的结论与依据；模型隐藏推理与 chain-of-thought 不保存、不展示、不写入 TravelPack。
+- 现有前端不消费新增字段，但必须能安全忽略；新增字段不得使既有页面崩溃。
+- 字段细节统一以 [travelpack-1.2.md](references/travelpack-1.2.md) 为准，1.1 契约继续作为 legacy compatibility 文档存在。
 
 ## 动态重规划
 
@@ -62,6 +84,7 @@ description: AI Travel Copilot built on Hks-Travel-Skill. Runs the trip-planning
 - 保留用户笔记、已完成待办、上传资料和附件属于网页合并层职责。Skill 在交付前明确提示使用"Agent 更新"入口，避免直接覆盖。
 - 交通采用扁平 `transportSegments`；相邻段的中转时长由网页动态计算。
 - 仅知日期的交通可以保存，`localTime` 使用 `null`，`precision` 使用 `date`。
+- TravelPack 1.2 新增字段与 1.1 字段同等对待：更新时整份保留 `preferences`、`constraints`、`planningMeta`、`alternatives`、`decisionLog`、`replanHistory`、`tripStatus`，不因局部修改而丢失。
 
 ## 升级已部署网站
 
@@ -99,3 +122,4 @@ description: AI Travel Copilot built on Hks-Travel-Skill. Runs the trip-planning
 - 地图 MCP、WebService API 与网页底图属于三种独立能力。腾讯地图 MCP 可以提供 POI 与路线数据，网页显示腾讯底图仍需 JavaScript API GL 的 Web Key、域名白名单和 `window.TRAVEL_MAP_ADAPTER`。用户需要腾讯底图时必须展示申请与配置步骤，禁止把 MCP 已连接描述成网页底图已接入。
 - 每次正式部署和升级都发布不含凭据的 `travel-app-manifest.json`。新版 Skill 不自动修改既有网站；用户指定目标网站后，Agent 按升级协议更新原项目。禁止用新应用静默替代原域名，禁止在纯代码升级中重写线上 TravelPack。
 - planning reason 只写简短用户可理解的结论与依据；模型隐藏推理与 chain-of-thought 不保存、不展示、不写入 TravelPack。
+- TravelPack 1.2 只做加法：不删除、不重命名、不改变 1.1 字段语义；新增字段不得承载凭据、Key、Cookie、Token 或 chain-of-thought。

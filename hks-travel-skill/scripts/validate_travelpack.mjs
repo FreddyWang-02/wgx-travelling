@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import fs from "node:fs";
-import { validateTravelPack } from "../assets/frontend-template/protocol.mjs";
+import { addonCollectionsV12, supportedSchemaVersions, validateTravelPack } from "../assets/frontend-template/protocol.mjs";
 
 const filename = process.argv[2];
 if (!filename) {
@@ -22,11 +22,18 @@ if (errors.length) {
   process.exit(1);
 }
 
-const collections = ["companions", "days", "places", "itineraryItems", "transportSegments", "stays", "tasks", "expenses", "materials", "assets", "sources"];
+const coreCollections = ["companions", "days", "places", "itineraryItems", "transportSegments", "stays", "tasks", "expenses", "materials", "assets", "sources"];
+const collections = {};
+for (const name of [...coreCollections, ...addonCollectionsV12]) {
+  if (Array.isArray(pack[name])) collections[name] = pack[name].length;
+}
 console.log(JSON.stringify({
   valid: true,
   protocol: pack.protocol,
   schemaVersion: pack.schemaVersion,
+  supportedSchemaVersions,
   tripId: pack.trip.id,
-  collections: Object.fromEntries(collections.map((name) => [name, pack[name].length])),
+  tripStatus: pack.tripStatus ?? null,
+  collections,
+  planningAddons: addonCollectionsV12.filter((name) => Array.isArray(pack[name])),
 }, null, 2));
